@@ -23,7 +23,9 @@
 
 > **Banco de dados:** [`Banco-de-Dados-Rumo.pdf`](Banco-de-Dados-Rumo.pdf) traz a sugestão de arquitetura para quando o catálogo sair dos arquivos TypeScript e passar para um banco, com contas e progresso sincronizado: o diagrama de relacionamentos, todas as tabelas com campos, tipos, chaves e restrições (inclusive footprints, pads, trilhas e vias do projeto de PCB), os índices, as decisões (PostgreSQL, textos bilíngues, geometria em JSONB, versões publicadas), os fluxos de dados, a operação e como escalar (cópia em [`docs/`](docs/Banco-de-Dados-Rumo.pdf)).
 
-> **Versão 1.2.0 (Atual):** nova identidade visual, no mesmo padrão do Grafo, do Crivo e do Pluma: **logo preta em fundo branco**, **fontes do sistema** (texto e monoespaçada) no lugar das fontes baixadas, a **paleta Rumo** (linho, vinho, ardósia e palha) como padrão e um **menu de paletas** com Rumo, Bento, Sonda e Nexo, cada uma com tema claro e escuro. A barra superior, os títulos, os botões, as abas dos labs e a troca de placa seguem a interface dos outros projetos, e uma **barra de status** mostra versão, placa ou lab, peças na bancada, labs concluídos, tema e paleta. A janela no estilo KiCad mantém as cores do Pcbnew e do visualizador 3D. O tema agora começa igual ao do sistema e a aparência é aplicada antes de a tela aparecer, sem piscar. Detalhes em [Paletas de cores](#paletas-de-cores).
+> **Versão 1.2.1 (Atual):** o **menu de paletas** mostra só as amostras de cor de cada paleta, sem o nome. A paleta em uso continua marcada, a tecla `C` continua passando para a próxima e o nome segue no leitor de tela, na dica do botão e na barra de status. As placas, os labs, a bancada e o progresso salvo não mudam.
+
+> **Versão 1.2.0:** nova identidade visual, no mesmo padrão do Grafo, do Crivo e do Pluma: **logo preta em fundo branco**, **fontes do sistema** (texto e monoespaçada) no lugar das fontes baixadas, a **paleta Rumo** (linho, vinho, ardósia e palha) como padrão e um **menu de paletas** com Rumo, Bento, Sonda e Nexo, cada uma com tema claro e escuro. A barra superior, os títulos, os botões, as abas dos labs e a troca de placa seguem a interface dos outros projetos, e uma **barra de status** mostra versão, placa ou lab, peças na bancada, labs concluídos, tema e paleta. A janela no estilo KiCad mantém as cores do Pcbnew e do visualizador 3D. O tema agora começa igual ao do sistema e a aparência é aplicada antes de a tela aparecer, sem piscar. Detalhes em [Paletas de cores](#paletas-de-cores).
 
 > **Versão 1.1.1:** licença que permite só usar e baixar, e topo da página da placa sem a barra de progresso.
 
@@ -78,7 +80,7 @@
   <img src="docs/images/tela-paletas.png" alt="O Rumo nas quatro paletas, Rumo, Bento, Sonda e Nexo, cada uma no tema claro e no escuro">
 </p>
 
-O botão com o ícone de paleta, no canto superior direito ao lado do botão de tema, abre a lista das paletas com as cores de cada uma (a tecla `C` passa para a próxima). A paleta vale para a interface inteira (barra superior, catálogo, ficha técnica, bancada, cartões das partes, abas dos labs, simuladores e janelas) e funciona junto com o tema claro ou escuro (tecla `T`). A janela no estilo KiCad mantém as cores do Pcbnew e o fundo do visualizador 3D, para continuar igual ao programa.
+O botão com o ícone de paleta, no canto superior direito ao lado do botão de tema, abre a lista das paletas, só com as amostras de cor de cada uma (a tecla `C` passa para a próxima; o nome da paleta em uso aparece na dica do botão e na barra de status). A paleta vale para a interface inteira (barra superior, catálogo, ficha técnica, bancada, cartões das partes, abas dos labs, simuladores e janelas) e funciona junto com o tema claro ou escuro (tecla `T`). A janela no estilo KiCad mantém as cores do Pcbnew e o fundo do visualizador 3D, para continuar igual ao programa.
 
 | Paleta | Origem | Tema claro | Tema escuro |
 |---|---|---|---|

@@ -117,7 +117,8 @@ test('troca a paleta pelo menu e pelo teclado e mantém a escolha', async ({ pag
   await expect(raiz).not.toHaveAttribute('data-paleta', /.+/);
   await page.locator('.cabecalho .paleta').click();
   await expect(page.locator('.menu .menu-item')).toHaveCount(4);
-  await page.locator('.menu .menu-item', { hasText: 'Bento' }).click();
+  await expect(page.locator('.menu')).toHaveText('');
+  await page.getByRole('menuitemradio', { name: 'Paleta Bento' }).click();
   await expect(raiz).toHaveAttribute('data-paleta', 'bento');
   await page.locator('body').click({ position: { x: 5, y: 300 } });
   await page.keyboard.press('c');
