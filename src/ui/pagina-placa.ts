@@ -62,7 +62,7 @@ const montarHeroi = (ctx: Contexto, placa: Placa, labs: readonly Laboratorio[]):
         'div',
         { class: 'heroi-texto' },
         h('p', { class: 'heroi-kicker mono' }, `${tr(placa.fabricante)} · ${placa.nome} · ${ui('guiaBancada')}`),
-        h('h1', { class: 'heroi-titulo' }, placa.sigla, labs.length ? h('span', { class: 'destaque' }, ' LABS') : null),
+        h('h1', { class: 'heroi-titulo' }, placa.sigla, labs.length ? h('span', { class: 'destaque' }, ' Labs') : null),
         h('p', { class: 'heroi-verbos' }, labs.length ? ui('verbos') : ui('verbosSemLab')),
         h('p', { class: 'heroi-resumo' }, tr(placa.resumo)),
         labs.length ? null : h('p', { class: 'aviso-sem-labs heroi-aviso' }, ui('semLabs')),

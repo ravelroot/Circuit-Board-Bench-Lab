@@ -1,8 +1,5 @@
-import '@fontsource-variable/bricolage-grotesque/wdth.css';
-import '@fontsource-variable/instrument-sans/wght.css';
-import '@fontsource/ibm-plex-mono/400.css';
-import '@fontsource/ibm-plex-mono/500.css';
 import './css/estilo.css';
+import { aplicarAparencia, proximaPaleta } from './app/aparencia';
 import type { Contexto, Pagina } from './app/contexto';
 import { criarEstado, Loja, type Rota } from './app/estado';
 import { caminho, lerRota, mesmaRota } from './app/rotas';
@@ -12,6 +9,7 @@ import { placaPorId, PLACAS } from './dados/placas';
 import { definirIdioma, ui } from './i18n/textos';
 import { montarCabecalho } from './ui/cabecalho';
 import { montarCatalogo } from './ui/catalogo';
+import { montarBarraStatus } from './ui/barra-status';
 import { montarAjuda, montarBusca } from './ui/dialogos';
 import { h } from './ui/dom';
 import { montarPaginaLab } from './ui/pagina-lab';
@@ -41,14 +39,11 @@ const ctx: Contexto = { loja, navegar };
 
 definirIdioma(loja.atual.idioma);
 
-const aplicarTema = (): void => {
-  document.documentElement.dataset.tema = loja.atual.tema;
-  document.querySelector('meta[name="color-scheme"]')?.setAttribute('content', loja.atual.tema === 'escuro' ? 'dark' : 'light');
-};
+const aplicarTema = (): void => aplicarAparencia(loja.atual.tema, loja.atual.paleta);
 aplicarTema();
 
 const palco = h('main', { class: 'pagina', id: 'conteudo' });
-const app = h('div', { class: 'app' }, montarCabecalho(ctx), palco, montarBusca(ctx), montarAjuda(ctx));
+const app = h('div', { class: 'app' }, montarCabecalho(ctx), palco, montarBarraStatus(ctx), montarBusca(ctx), montarAjuda(ctx));
 let atual: Pagina | null = null;
 
 const titulo = (): string => {
@@ -78,7 +73,7 @@ loja.assinar((e, a) => {
   } else if (!mesmaRota(e.rota, a.rota)) {
     desenhar(true);
   }
-  if (e.tema !== a.tema) aplicarTema();
+  if (e.tema !== a.tema || e.paleta !== a.paleta) aplicarTema();
 });
 
 window.addEventListener('popstate', () => loja.alterar({ rota: lerRota(location.hash, catalogo) }));
@@ -117,6 +112,7 @@ document.addEventListener('keydown', (ev) => {
   const acoes: Record<string, () => void> = {
     '/': () => loja.alterar({ busca: true }),
     t: () => loja.alterar({ tema: e.tema === 'escuro' ? 'claro' : 'escuro' }),
+    c: () => loja.alterar({ paleta: proximaPaleta(e.paleta) }),
     l: () => loja.alterar({ idioma: e.idioma === 'pt' ? 'en' : 'pt' }),
     p: () => navegar({ pagina: 'catalogo', placa: null, lab: null }),
     ',': () => vizinhoPlaca(-1),

@@ -97,7 +97,9 @@ test('a fiação anda fio a fio', async ({ page }) => {
 });
 
 test('busca por lab, troca de idioma e tema pelo teclado', async ({ page }) => {
+  await page.emulateMedia({ colorScheme: 'dark' });
   await page.goto('./#/esp32-s3');
+  await expect(page.locator('html')).toHaveAttribute('data-tema', 'escuro');
   await page.keyboard.press('Control+k');
   await page.locator('.busca-campo').fill('ponte h');
   await page.keyboard.press('Enter');
@@ -107,4 +109,27 @@ test('busca por lab, troca de idioma e tema pelo teclado', async ({ page }) => {
   await expect(page.locator('html')).toHaveAttribute('lang', 'en');
   await page.keyboard.press('t');
   await expect(page.locator('html')).toHaveAttribute('data-tema', 'claro');
+});
+
+test('troca a paleta pelo menu e pelo teclado e mantém a escolha', async ({ page }) => {
+  await page.goto('./#/esp32-s3');
+  const raiz = page.locator('html');
+  await expect(raiz).not.toHaveAttribute('data-paleta', /.+/);
+  await page.locator('.cabecalho .paleta').click();
+  await expect(page.locator('.menu .menu-item')).toHaveCount(4);
+  await page.locator('.menu .menu-item', { hasText: 'Bento' }).click();
+  await expect(raiz).toHaveAttribute('data-paleta', 'bento');
+  await page.locator('body').click({ position: { x: 5, y: 300 } });
+  await page.keyboard.press('c');
+  await expect(raiz).toHaveAttribute('data-paleta', 'sonda');
+  await page.reload();
+  await expect(raiz).toHaveAttribute('data-paleta', 'sonda');
+  await expect(page.locator('.barra-status')).toContainText('Paleta Sonda');
+});
+
+test('mostra a marca e a barra de status', async ({ page }) => {
+  await page.goto('./#/esp32-s3');
+  await expect(page.locator('.marca-nome')).toHaveText('Rumo');
+  await expect(page.locator('.heroi-titulo')).toHaveText('ESP32-S3 Labs');
+  await expect(page.locator('.barra-status')).toContainText('ESP32-S3 DevKitC-1');
 });

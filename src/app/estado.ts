@@ -1,6 +1,7 @@
 import type { Idioma } from '../dados/tipos';
+import { ehPaleta, PALETA_PADRAO, temaDoSistema, type Paleta, type Tema } from './aparencia';
 
-export type Tema = 'escuro' | 'claro';
+export type { Paleta, Tema } from './aparencia';
 
 export interface Rota {
   readonly pagina: 'catalogo' | 'placa' | 'lab';
@@ -11,6 +12,7 @@ export interface Rota {
 export interface Estado {
   readonly idioma: Idioma;
   readonly tema: Tema;
+  readonly paleta: Paleta;
   readonly rota: Rota;
   readonly bancada: readonly string[];
   readonly passos: Readonly<Record<string, readonly number[]>>;
@@ -76,7 +78,8 @@ export const criarEstado = (rota: Rota, validar: Validador): Estado => {
   const pref = ler(CHAVE_PREFERENCIAS);
   return {
     idioma: pref.idioma === 'pt' || pref.idioma === 'en' ? pref.idioma : idiomaDoNavegador(),
-    tema: pref.tema === 'claro' || pref.tema === 'escuro' ? pref.tema : 'escuro',
+    tema: pref.tema === 'claro' || pref.tema === 'escuro' ? pref.tema : temaDoSistema(),
+    paleta: ehPaleta(pref.paleta) ? pref.paleta : PALETA_PADRAO,
     rota,
     busca: false,
     ajuda: false,
@@ -102,8 +105,8 @@ export class Loja {
     const mudou = (Object.keys(parcial) as (keyof Estado)[]).some((k) => anterior[k] !== proximo[k]);
     if (!mudou) return;
     this.estado = proximo;
-    if (anterior.idioma !== proximo.idioma || anterior.tema !== proximo.tema) {
-      gravar(CHAVE_PREFERENCIAS, { idioma: proximo.idioma, tema: proximo.tema });
+    if (anterior.idioma !== proximo.idioma || anterior.tema !== proximo.tema || anterior.paleta !== proximo.paleta) {
+      gravar(CHAVE_PREFERENCIAS, { idioma: proximo.idioma, tema: proximo.tema, paleta: proximo.paleta });
     }
     if (anterior.bancada !== proximo.bancada || anterior.passos !== proximo.passos || anterior.feitos !== proximo.feitos) {
       gravar(CHAVE_PROGRESSO, { bancada: proximo.bancada, passos: proximo.passos, feitos: proximo.feitos });

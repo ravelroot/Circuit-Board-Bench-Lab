@@ -1,6 +1,6 @@
 {
   "name": "rumo",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "private": true,
   "description": "Bancada de eletrônica interativa: placas peça a peça, inventário e laboratórios com fiação, comandos, passos, simuladores e código.",
   "license": "SEE LICENSE IN LICENSE",
@@ -17,9 +17,6 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@fontsource-variable/bricolage-grotesque": "5.3.0",
-    "@fontsource-variable/instrument-sans": "5.3.0",
-    "@fontsource/ibm-plex-mono": "5.3.0",
     "three": "0.187.0"
   },
   "devDependencies": {

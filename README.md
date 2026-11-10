@@ -5,7 +5,7 @@
 <h1 align="center">Rumo<br><sub><sup><sup><sub>Copyright (©) 2026 Erik Pimenta</sub></sup></sup></sub></h1>
 
 <p align="center">
-  Bancada de eletrônica interativa com 32 placas e circuitos, do ESP32 à placa-mãe, mostrados como no KiCad: um visualizador 3D realista em WebGL, com cobre, máscara de solda, serigrafia, trilhas e componentes modelados, e um editor de PCB técnico em 2D, com as camadas F.Cu, B.Cu, F.Silkscreen, F.Courtyard, F.Fab e Edge.Cuts, painel de aparência e propriedades de cada footprint. Cada placa gira nos três eixos (X, Y e Z), troca de vista, separa as peças numa vista explodida e identifica as 252 partes do catálogo, dizendo o que é cada uma e para que serve. As placas com laboratórios trazem o inventário da bancada, que mostra o que dá para montar com as peças que você tem, e 25 labs com explicação, fiação animada fio a fio, comandos prontos para copiar, passos que ficam salvos, prévia em simulador e código. São 16 simuladores, do monitor serial ao radar Bluetooth, ao sintetizador com som no navegador e aos LEDs de POST de uma placa-mãe. Tudo em português e inglês, com tema claro e escuro na paleta do Bento, busca e atalhos de teclado. Roda inteiro no navegador, sem servidor, com uma única biblioteca em produção (three.js).<br>
+  Bancada de eletrônica interativa com 32 placas e circuitos, do ESP32 à placa-mãe, mostrados como no KiCad: um visualizador 3D realista em WebGL, com cobre, máscara de solda, serigrafia, trilhas e componentes modelados, e um editor de PCB técnico em 2D, com as camadas F.Cu, B.Cu, F.Silkscreen, F.Courtyard, F.Fab e Edge.Cuts, painel de aparência e propriedades de cada footprint. Cada placa gira nos três eixos (X, Y e Z), troca de vista, separa as peças numa vista explodida e identifica as 252 partes do catálogo, dizendo o que é cada uma e para que serve. As placas com laboratórios trazem o inventário da bancada, que mostra o que dá para montar com as peças que você tem, e 25 labs com explicação, fiação animada fio a fio, comandos prontos para copiar, passos que ficam salvos, prévia em simulador e código. São 16 simuladores, do monitor serial ao radar Bluetooth, ao sintetizador com som no navegador e aos LEDs de POST de uma placa-mãe. Tudo em português e inglês, com tema claro e escuro, quatro paletas de cores (Rumo, Bento, Sonda e Nexo), busca e atalhos de teclado. Roda inteiro no navegador, sem servidor, com uma única biblioteca em produção (three.js).<br>
   Pronto para usar no navegador.
 </p>
 
@@ -23,6 +23,10 @@
 
 > **Banco de dados:** [`Banco-de-Dados-Rumo.pdf`](Banco-de-Dados-Rumo.pdf) traz a sugestão de arquitetura para quando o catálogo sair dos arquivos TypeScript e passar para um banco, com contas e progresso sincronizado: o diagrama de relacionamentos, todas as tabelas com campos, tipos, chaves e restrições (inclusive footprints, pads, trilhas e vias do projeto de PCB), os índices, as decisões (PostgreSQL, textos bilíngues, geometria em JSONB, versões publicadas), os fluxos de dados, a operação e como escalar (cópia em [`docs/`](docs/Banco-de-Dados-Rumo.pdf)).
 
+> **Versão 1.2.0 (Atual):** nova identidade visual, no mesmo padrão do Grafo, do Crivo e do Pluma: **logo preta em fundo branco**, **fontes do sistema** (texto e monoespaçada) no lugar das fontes baixadas, a **paleta Rumo** (linho, vinho, ardósia e palha) como padrão e um **menu de paletas** com Rumo, Bento, Sonda e Nexo, cada uma com tema claro e escuro. A barra superior, os títulos, os botões, as abas dos labs e a troca de placa seguem a interface dos outros projetos, e uma **barra de status** mostra versão, placa ou lab, peças na bancada, labs concluídos, tema e paleta. A janela no estilo KiCad mantém as cores do Pcbnew e do visualizador 3D. O tema agora começa igual ao do sistema e a aparência é aplicada antes de a tela aparecer, sem piscar. Detalhes em [Paletas de cores](#paletas-de-cores).
+
+> **Versão 1.1.1:** licença que permite só usar e baixar, e topo da página da placa sem a barra de progresso.
+
 <p align="center">
   <img src="docs/images/tela-3d.png" alt="ESP32-S3 no visualizador 3D no estilo KiCad com o módulo aceso e as oito partes identificadas ao redor">
 </p>
@@ -38,13 +42,14 @@
 - **Mapa de laboratórios:** os labs da placa agrupados por tema, com o estado de cada um (feito por você, pronto na bancada, falta uma peça, faltam peças).
 - **Lab completo em seis abas:** Como (a teoria em blocos curtos), Fiação (diagrama animado fio a fio com anterior, tocar, próximo e mostrar todos, mais a tabela de pinos), Comandos (prontos para copiar), Passos (checklist salvo no navegador que marca o lab como feito), Prévia (o simulador) e Código (com botão de copiar). A barra de abas acompanha a rolagem e o rodapé leva ao próximo lab ou ao próximo tema.
 - **16 simuladores:** monitor serial com comandos e LED (cores, pisca, respiração e SOS), varredura de Wi-Fi com canais e sinal, radar Bluetooth, sintetizador com teclado, formas de onda e som de verdade pelo Web Audio, escopo de dois microfones com bias e comparador, leitor RFID com memória do cartão e créditos, tela ST7789 e LCD 16×2, PWM, servo, ultrassom, mapa dos 40 pinos do Raspberry Pi, slots de memória em dual channel, LEDs de POST com cenários de falha, temporizador 555, regulador 7805 com calor e ponte H.
-- **Busca e atalhos:** `Ctrl` + `K` ou `/` busca placas, partes e labs nas duas línguas. `,` e `.` trocam de placa, `[` e `]` trocam de lab, `P` abre o catálogo e `?` mostra todos os atalhos. Com a vista 3D em foco, as setas giram a placa e `E` separa as peças.
-- **Idiomas e temas:** português e inglês em todo o conteúdo e tema claro e escuro. A escolha, as peças da bancada e os passos marcados ficam salvos no navegador.
+- **Busca e atalhos:** `Ctrl` + `K` ou `/` busca placas, partes e labs nas duas línguas. `,` e `.` trocam de placa, `[` e `]` trocam de lab, `P` abre o catálogo, `C` troca a paleta e `?` mostra todos os atalhos. Com a vista 3D em foco, as setas giram a placa e `E` separa as peças.
+- **Idiomas, temas e paletas:** português e inglês em todo o conteúdo, tema claro e escuro (a primeira visita segue o tema do sistema) e quatro paletas de cores: Rumo, Bento, Sonda e Nexo. A escolha, as peças da bancada e os passos marcados ficam salvos no navegador. Detalhes em [Paletas de cores](#paletas-de-cores).
+- **Barra de status:** no rodapé, a versão, a placa ou o lab abertos, quantas peças estão na bancada, quantos labs foram concluídos, o tema e a paleta.
 - **Projeto de PCB gerado para cada placa:** 410 footprints com referências e bibliotecas no padrão do KiCad, mais de 12 mil pads, 1.020 trilhas e 677 vias, gerados de forma determinística a partir do desenho de cada placa.
 - **Endereço por placa e por lab:** por exemplo, `#/atx` ou `#/esp32-s3/rfid-rc522`, bons para compartilhar ou usar em aula.
 
 <p align="center">
-  <img src="docs/images/tela-editor-pcb.png" alt="Arduino Uno R3 no editor de PCB no estilo KiCad com o ATmega328P selecionado e as propriedades do footprint">
+  <img src="docs/images/tela-editor-pcb.png" alt="Arduino Uno R3 no editor de PCB no estilo KiCad, no tema escuro, com o ATmega328P selecionado e as propriedades do footprint">
 </p>
 
 <p align="center">
@@ -53,19 +58,36 @@
 </p>
 
 <p align="center">
-  <img src="docs/images/tela-explodida.png" width="49%" alt="Raspberry Pi 5 no visualizador 3D na vista explodida com o SoC aceso">
-  <img src="docs/images/tela-claro.png" width="49%" alt="Placa-mãe ATX no tema claro com o soquete LGA aceso">
+  <img src="docs/images/tela-explodida.png" width="49%" alt="Raspberry Pi 5 no visualizador 3D, no tema escuro, na vista explodida com o SoC aceso">
+  <img src="docs/images/tela-claro.png" width="49%" alt="Placa-mãe ATX na paleta Bento, no tema claro, com o soquete do processador aceso">
 </p>
 
 <p align="center">
   <img src="docs/images/tela-fiacao.png" width="49%" alt="Fiação do leitor RC522 passo a passo">
-  <img src="docs/images/tela-previa.png" width="49%" alt="Prévia do radar Bluetooth com os aparelhos por intensidade">
+  <img src="docs/images/tela-previa.png" width="49%" alt="Prévia do radar Bluetooth, no tema escuro, com os aparelhos por intensidade">
 </p>
 
 <p align="center">
   <img src="docs/images/tela-catalogo.png" width="49%" alt="Catálogo com as 32 placas e circuitos renderizados em 3D">
   <img src="docs/images/tela-celular.png" width="24%" alt="Pisca com NE555 no celular">
 </p>
+
+## Paletas de cores
+
+<p align="center">
+  <img src="docs/images/tela-paletas.png" alt="O Rumo nas quatro paletas, Rumo, Bento, Sonda e Nexo, cada uma no tema claro e no escuro">
+</p>
+
+O botão com o ícone de paleta, no canto superior direito ao lado do botão de tema, abre a lista das paletas com as cores de cada uma (a tecla `C` passa para a próxima). A paleta vale para a interface inteira (barra superior, catálogo, ficha técnica, bancada, cartões das partes, abas dos labs, simuladores e janelas) e funciona junto com o tema claro ou escuro (tecla `T`). A janela no estilo KiCad mantém as cores do Pcbnew e o fundo do visualizador 3D, para continuar igual ao programa.
+
+| Paleta | Origem | Tema claro | Tema escuro |
+|---|---|---|---|
+| **Rumo** (padrão) | paleta da casa, a mesma do Grafo, do Crivo e do Pluma | linho `#E6DDCE`, vinho `#5D1C16`, ardósia `#A3B4BE`, palha `#F6E4A6` | fundo `#1D1613`, superfície `#30251F`, destaque palha `#F6E4A6` |
+| **Bento** | painel administrativo | névoa `#F5F4F4`, cinza `#BAB7B6`, grafite `#4D4B4B`, tinta `#000000` | fundo `#020202`, superfície `#1E1D1D`, destaque branco `#FFFFFF` |
+| **Sonda** | motor de busca | areia `#F3F1EC`, azul `#7FA7B8`, noite `#17212B`, magenta `#A8235A` | fundo `#0F161B`, superfície `#151E25`, destaque rosa `#F0679A` |
+| **Nexo** | paleta original do Nexo | papel `#E8E8E8`, pó `#D9D1CE`, malva `#AB9D9D`, tinta `#000000` | fundo `#000000`, superfície `#221E1D`, destaque papel `#E8E8E8` |
+
+A escolha fica salva neste navegador e é aplicada antes de a tela aparecer, sem piscar, pelo [`public/aparencia.js`](public/aparencia.js). As paletas são variáveis CSS em `:root[data-paleta]` e `:root[data-tema]` no [`src/css/estilo.css`](src/css/estilo.css), e a lista do menu fica em `PALETAS` no [`src/app/aparencia.ts`](src/app/aparencia.ts). A tipografia usa as fontes do próprio sistema, como no Grafo, no Crivo e no Pluma: `system-ui` para o texto e `ui-monospace` para pinos, comandos e código.
 
 ## Arquitetura
 
@@ -89,7 +111,7 @@ flowchart LR
 | `src/dados/placas` | As 32 placas, em cinco arquivos por categoria, e o catálogo ordenado |
 | `src/dados/laboratorios` | Os 25 labs e as consultas por placa |
 | `src/dados/pecas.ts` | As peças da bancada |
-| `src/app` | Estado com leitura validada do navegador, rotas e cálculo da bancada |
+| `src/app` | Estado com leitura validada do navegador, aparência (tema e paleta), rotas e cálculo da bancada |
 | `src/pcb` | O modelo de um projeto de PCB (footprints, pads, trilhas, vias, furos e textos) e o gerador determinístico que classifica cada componente e monta o projeto |
 | `src/ui/kicad/janela.ts` | A janela com as abas Visualizador 3D e Editor de PCB |
 | `src/ui/kicad/visor3d.ts`, `cena.ts`, `modelos3d.ts`, `texturas.ts` | O visualizador 3D em WebGL: cena, luzes e ambiente, modelos dos componentes, texturas da face (máscara, cobre, serigrafia e acabamento), vistas, explosão, seleção e posição de cada parte na tela |
@@ -99,7 +121,7 @@ flowchart LR
 | `src/ui/fiacao.ts` | Diagrama de fiação animado e tabela de pinos |
 | `src/ui/simuladores` | Os 16 simuladores |
 | `src/i18n/textos.ts` | Textos da interface em português e inglês |
-| `src/css/estilo.css` | Tokens da paleta do Bento nos dois temas, layout, janela no estilo KiCad, páginas, simuladores e responsivo |
+| `src/css/estilo.css` | Tokens das quatro paletas nos dois temas, layout, janela no estilo KiCad, páginas, simuladores e responsivo |
 | `tests/unit` | Catálogo, partes desenhadas, projetos de PCB, labs, bancada, progresso salvo e rotas |
 | `tests/e2e` | Interface de ponta a ponta com Playwright |
 
@@ -152,7 +174,7 @@ Os testes unitários conferem o catálogo (pelo menos 30 placas, ids únicos e a
 - **Leitura validada do navegador:** peças, labs e passos salvos são conferidos contra o catálogo, com limite de tamanho, e qualquer valor desconhecido é descartado.
 - **Rotas higienizadas:** o endereço só aceita letras, números e hífen e cai no catálogo se a placa não existir.
 - **Sem servidor, sem cookies e sem rastreadores.** O áudio do sintetizador é gerado no próprio navegador e só começa com um toque.
-- **Dependências mínimas:** em produção são só as fontes e o three.js, com versão fixa. O Dependabot acompanha npm e GitHub Actions toda semana.
+- **Dependência única em produção:** só o three.js, com versão fixa. A interface usa as fontes do próprio sistema e nada é baixado de fora. O Dependabot acompanha npm e GitHub Actions toda semana.
 
 ## Atalhos de teclado
 
@@ -169,6 +191,7 @@ Os testes unitários conferem o catálogo (pelo menos 30 placas, ids únicos e a
 | `←` `→` `↑` `↓` / `+` / `−` / `Home` | Mover, aproximar, afastar e ajustar a placa (com o editor de PCB em foco) |
 | `G` | Giro automático (com a vista 3D em foco) |
 | `T` | Tema claro ou escuro |
+| `C` | Próxima paleta de cores |
 | `L` | Português ou inglês |
 | `Esc` | Fechar a janela aberta |
 | `?` | Folha de atalhos |
@@ -244,7 +267,7 @@ Os testes unitários conferem o catálogo (pelo menos 30 placas, ids únicos e a
 
 ```
 src/
-  app/                      estado, rotas e cálculo da bancada
+  app/                      estado, aparência, rotas e cálculo da bancada
   css/                      estilo.css com tokens, janela KiCad, páginas, simuladores e responsivo
   dados/
     placas/                 as 32 placas em cinco arquivos e o catálogo
@@ -257,7 +280,7 @@ src/
     kicad/                  visualizador 3D, editor de PCB, janela e miniaturas
     simuladores/            os 16 simuladores
   main.ts                   ponto de entrada, rotas e atalhos de teclado
-public/                     ícone
+public/                     ícone e aparencia.js (tema e paleta antes da primeira pintura)
 tests/
   unit/                     Vitest
   e2e/                      Playwright
@@ -277,7 +300,6 @@ O Rumo depende de componentes com licenças próprias, que continuam valendo par
 | [TypeScript](https://www.typescriptlang.org/) | Linguagem e verificação de tipos | Apache-2.0 |
 | [Vitest](https://vitest.dev/) | Testes unitários | MIT |
 | [Playwright](https://playwright.dev/) | Testes de ponta a ponta | Apache-2.0 |
-| [Bricolage Grotesque](https://fonts.google.com/specimen/Bricolage+Grotesque), [Instrument Sans](https://fonts.google.com/specimen/Instrument+Sans) e [IBM Plex Mono](https://www.ibm.com/plex/) via [Fontsource](https://fontsource.org/) | Tipografia | OFL-1.1 |
 
 Os desenhos das placas e os projetos de PCB gerados são representações didáticas, com posições e medidas aproximadas, e não substituem o esquema ou a folha de dados do fabricante. Os nomes de produtos e marcas citados pertencem aos seus donos.
 
