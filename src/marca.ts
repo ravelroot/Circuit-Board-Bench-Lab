@@ -1,6 +1,6 @@
 export const MARCA = {
   nome: 'Rumo',
-  versao: '1.1.0',
+  versao: '1.1.1',
   repositorio: 'https://github.com/ravelroot/Circuit-Board-Bench-Lab',
   autor: 'ravelroot',
   grade: [

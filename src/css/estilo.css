@@ -1335,57 +1335,8 @@
     font-size: 1rem;
   }
 
-  .progresso {
+  .heroi-aviso {
     margin-top: 1.2rem;
-  }
-
-  .progresso-topo {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-  }
-
-  .progresso-contagem {
-    font-size: 1.1rem;
-  }
-
-  .progresso-barra {
-    display: flex;
-    gap: 3px;
-    height: 1.3rem;
-    margin: 0.5rem 0 1rem;
-  }
-
-  .progresso-barra .seg {
-    flex: 1;
-    border-radius: 2px;
-    background: color-mix(in oklab, var(--cor-tema) 22%, transparent);
-    border: 1px solid color-mix(in oklab, var(--cor-tema) 45%, transparent);
-  }
-
-  .progresso-barra .seg.feito {
-    background: var(--cor-tema);
-  }
-
-  .progresso-numeros {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1rem;
-  }
-
-  .progresso-numeros div {
-    display: flex;
-    flex-direction: column;
-  }
-
-  .progresso-numeros strong {
-    font-size: 1.8rem;
-    line-height: 1;
-  }
-
-  .progresso-numeros span {
-    font-size: 0.74rem;
-    color: var(--texto-3);
   }
 
   .aviso-sem-labs {

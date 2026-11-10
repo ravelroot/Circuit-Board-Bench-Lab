@@ -75,7 +75,8 @@ test('marcar peças libera labs e os passos ficam salvos', async ({ page }) => {
   await page.reload();
   await expect(page.locator('.lab-passos input:checked')).toHaveCount(4);
   await page.goto('./#/esp32-s3');
-  await expect(page.locator('.progresso-contagem')).toHaveText('1/9');
+  await expect(page.locator('#labs .ladrilho.sit-feito')).toHaveCount(1);
+  await expect(page.locator('.progresso')).toHaveCount(0);
 });
 
 test('o monitor serial responde aos comandos e o LED muda', async ({ page }) => {

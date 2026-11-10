@@ -2,40 +2,52 @@ Licença de Uso do Rumo
 
 Copyright (c) 2026 Erik Pimenta. Todos os direitos reservados.
 
-1. Permissão de uso
-Qualquer pessoa pode acessar e usar o Rumo na versão publicada pelo autor
-(https://ravelroot.github.io/Circuit-Board-Bench-Lab/), para fins
-pessoais, educacionais ou profissionais, sem custo.
+1. O que é permitido
+Qualquer pessoa pode, sem custo:
+  a) acessar e usar o Rumo na versão publicada pelo autor
+     (https://ravelroot.github.io/Circuit-Board-Bench-Lab/), para fins
+     pessoais, educacionais ou profissionais;
+  b) baixar o Rumo (o repositório ou os arquivos de uma versão publicada
+     em Releases) e executá-lo no próprio computador, exatamente como foi
+     publicado, para o mesmo uso do item anterior.
 
 2. O que não é permitido
 Sem autorização prévia e por escrito do autor, não é permitido:
-  a) copiar ou reproduzir o código-fonte, no todo ou em parte;
-  b) modificar, adaptar, traduzir ou criar obras derivadas;
-  c) distribuir, publicar, hospedar em outro endereço, sublicenciar,
-     vender ou alugar o software ou qualquer parte dele;
-  d) reutilizar em outros projetos os textos, os dados das placas e dos
-     laboratórios, os desenhos, as animações, o nome "Rumo" ou a logo;
-  e) remover ou alterar este aviso de direitos.
+  a) modificar, adaptar, traduzir ou criar obras derivadas do software ou
+     de qualquer parte dele;
+  b) vender, alugar, licenciar, sublicenciar, cobrar pelo acesso ou
+     incluir o software, no todo ou em parte, em produto ou serviço pago;
+  c) redistribuir, publicar, espelhar ou hospedar o software em outro
+     endereço, mesmo sem alterações;
+  d) reutilizar em outros projetos o código, os textos, os dados das
+     placas e dos laboratórios, os desenhos, os modelos 3D, as animações,
+     o nome "Rumo" ou a logo;
+  e) remover ou alterar os avisos de direitos ou esta licença.
 
-3. Plataforma GitHub
+3. Cópias baixadas
+Cada cópia baixada serve apenas a quem a baixou e deve manter este
+arquivo. Esta licença não transfere a propriedade do software; todos os
+direitos não concedidos expressamente continuam com o autor.
+
+4. Plataforma GitHub
 Esta licença não restringe os direitos de visualizar o repositório e de
 criar forks dentro do próprio GitHub que os Termos de Serviço do GitHub
 concedem aos seus usuários. Nenhum outro direito é concedido por esses
-forks.
+forks, inclusive o de modificar, publicar ou vender.
 
-4. Componentes de terceiros
-As fontes e as ferramentas de terceiros usadas pelo projeto continuam
-regidas pelas próprias licenças, listadas no README.
+5. Componentes de terceiros
+A biblioteca three.js, as fontes e as ferramentas de terceiros usadas pelo
+projeto continuam regidas pelas próprias licenças, listadas no README.
 
-5. Garantia e responsabilidade
+6. Garantia e responsabilidade
 O software é fornecido "no estado em que se encontra", sem garantia de
 qualquer tipo. Em nenhuma hipótese o autor responde por danos decorrentes
 do uso ou da impossibilidade de uso do software, inclusive em montagens
 elétricas feitas a partir dos laboratórios.
 
-6. Encerramento
-Qualquer uso em desacordo com esta licença encerra automaticamente a
-permissão concedida no item 1.
+7. Encerramento
+Qualquer uso em desacordo com esta licença encerra automaticamente as
+permissões do item 1, e as cópias baixadas devem ser apagadas.
 
 Pedidos de autorização: pelo perfil ravelroot no GitHub.
 
@@ -45,38 +57,51 @@ Rumo Use License
 
 Copyright (c) 2026 Erik Pimenta. All rights reserved.
 
-1. Permission to use
-Anyone may access and use Rumo as published by the author
-(https://ravelroot.github.io/Circuit-Board-Bench-Lab/), for personal,
-educational or professional purposes, free of charge.
+1. What is permitted
+Anyone may, free of charge:
+  a) access and use Rumo as published by the author
+     (https://ravelroot.github.io/Circuit-Board-Bench-Lab/), for personal,
+     educational or professional purposes;
+  b) download Rumo (the repository or the files of a version published in
+     Releases) and run it on their own computer, exactly as published, for
+     the same purposes as above.
 
 2. What is not permitted
 Without the author's prior written permission, you may not:
-  a) copy or reproduce the source code, in whole or in part;
-  b) modify, adapt, translate or create derivative works;
-  c) distribute, publish, host at another address, sublicense, sell or
-     rent the software or any part of it;
-  d) reuse in other projects the texts, the board and lab data, the
-     drawings, the animations, the name "Rumo" or the logo;
-  e) remove or alter this rights notice.
+  a) modify, adapt, translate or create derivative works of the software
+     or any part of it;
+  b) sell, rent, license, sublicense, charge for access to, or include the
+     software, in whole or in part, in a paid product or service;
+  c) redistribute, publish, mirror or host the software at another
+     address, even unmodified;
+  d) reuse in other projects the code, the texts, the board and lab data,
+     the drawings, the 3D models, the animations, the name "Rumo" or the
+     logo;
+  e) remove or alter the rights notices or this license.
 
-3. GitHub platform
+3. Downloaded copies
+Each downloaded copy is for the sole use of the person who downloaded it
+and must keep this file. This license does not transfer ownership of the
+software; all rights not expressly granted remain with the author.
+
+4. GitHub platform
 This license does not restrict the rights to view the repository and to
 fork it within GitHub that the GitHub Terms of Service grant to its users.
-No other rights are granted by such forks.
+No other rights are granted by such forks, including the rights to modify,
+publish or sell.
 
-4. Third-party components
-The fonts and third-party tools used by the project remain under their
-own licenses, listed in the README.
+5. Third-party components
+The three.js library, the fonts and the third-party tools used by the
+project remain under their own licenses, listed in the README.
 
-5. Warranty and liability
+6. Warranty and liability
 The software is provided "as is", without warranty of any kind. In no
 event shall the author be liable for any damages arising from the use of,
 or the inability to use, the software, including electrical builds made
 from the labs.
 
-6. Termination
+7. Termination
 Any use that does not comply with this license automatically terminates
-the permission granted in section 1.
+the permissions in section 1, and downloaded copies must be deleted.
 
 Permission requests: through the ravelroot profile on GitHub.

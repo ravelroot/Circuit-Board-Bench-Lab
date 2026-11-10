@@ -35,7 +35,7 @@
 - **Peça a peça:** ao lado da placa, um cartão por parte diz **o que é** e **para que serve**, com linhas que ligam o cartão à peça na placa. Escolher um cartão ou clicar na peça, no 3D ou no editor de PCB, acende as duas e apaga o resto. Os cartões mostram também quais labs usam aquela parte.
 - **Ficha técnica:** processador, memória, conexões, alimentação, tamanho e usos comuns de cada placa.
 - **O que tem na sua bancada?** Marque as peças que você tem e o Rumo mostra quantos labs dá para montar agora, quais estão a uma peça de distância (e qual peça falta) e quantos pedem mais. "Tenho todas" e "Limpar" resolvem com um clique, e a busca filtra as peças.
-- **Mapa de laboratórios:** os labs da placa agrupados por tema, com o estado de cada um (feito por você, pronto na bancada, falta uma peça, faltam peças) e a barra de progresso no topo.
+- **Mapa de laboratórios:** os labs da placa agrupados por tema, com o estado de cada um (feito por você, pronto na bancada, falta uma peça, faltam peças).
 - **Lab completo em seis abas:** Como (a teoria em blocos curtos), Fiação (diagrama animado fio a fio com anterior, tocar, próximo e mostrar todos, mais a tabela de pinos), Comandos (prontos para copiar), Passos (checklist salvo no navegador que marca o lab como feito), Prévia (o simulador) e Código (com botão de copiar). A barra de abas acompanha a rolagem e o rodapé leva ao próximo lab ou ao próximo tema.
 - **16 simuladores:** monitor serial com comandos e LED (cores, pisca, respiração e SOS), varredura de Wi-Fi com canais e sinal, radar Bluetooth, sintetizador com teclado, formas de onda e som de verdade pelo Web Audio, escopo de dois microfones com bias e comparador, leitor RFID com memória do cartão e créditos, tela ST7789 e LCD 16×2, PWM, servo, ultrassom, mapa dos 40 pinos do Raspberry Pi, slots de memória em dual channel, LEDs de POST com cenários de falha, temporizador 555, regulador 7805 com calor e ponte H.
 - **Busca e atalhos:** `Ctrl` + `K` ou `/` busca placas, partes e labs nas duas línguas. `,` e `.` trocam de placa, `[` e `]` trocam de lab, `P` abre o catálogo e `?` mostra todos os atalhos. Com a vista 3D em foco, as setas giram a placa e `E` separa as peças.
@@ -48,7 +48,7 @@
 </p>
 
 <p align="center">
-  <img src="docs/images/tela-placa.png" width="49%" alt="Página da ESP32-S3: troca de placa, título, progresso dos labs e ficha técnica">
+  <img src="docs/images/tela-placa.png" width="49%" alt="Página da ESP32-S3: troca de placa, título, resumo e ficha técnica">
   <img src="docs/images/tela-bancada.png" width="49%" alt="Bancada com peças marcadas, labs prontos e labs a uma peça">
 </p>
 
@@ -115,16 +115,17 @@ O visualizador 3D desenha a face da placa num canvas (máscara, cobre sob a más
 
 O Rumo está publicado em **https://ravelroot.github.io/Circuit-Board-Bench-Lab/**. Não precisa instalar nada.
 
-### Desenvolvimento (somente o mantenedor)
+### No seu computador
 
-O código está aberto para leitura, mas copiar, modificar ou redistribuir depende de autorização por escrito (veja a [Licença](#licença)). Para quem mantém o projeto, o fluxo é:
+Você pode baixar o Rumo e rodar no seu computador, exatamente como foi publicado, para uso próprio (veja a [Licença](#licença)). Baixe o `.zip` da última versão em **Releases** ou clone o repositório e rode:
 
 ```bash
 npm ci
-npm run dev                       # http://localhost:5173
 npm run build                     # gera a pasta dist/
 npm run preview                   # http://localhost:4173
 ```
+
+Modificar, vender, redistribuir ou hospedar em outro endereço depende de autorização por escrito do autor.
 
 ### Publicando no GitHub Pages
 
@@ -284,4 +285,13 @@ Os desenhos das placas e os projetos de PCB gerados são representações didát
 
 Copyright (©) 2026 Erik Pimenta. Todos os direitos reservados.
 
-O Rumo é distribuído sob uma [licença de uso](LICENSE): qualquer pessoa pode usar a ferramenta publicada, gratuitamente, para estudo, aula ou trabalho. Copiar, modificar, redistribuir, hospedar em outro endereço ou reutilizar o código, os textos, os dados das placas, os desenhos, o nome ou a logo depende de autorização por escrito do autor. Os componentes de terceiros listados acima continuam sob as próprias licenças.
+O Rumo é distribuído sob uma [licença de uso](LICENSE) que permite apenas **usar** e **baixar**:
+
+| Permitido | Não permitido sem autorização por escrito |
+|---|---|
+| Usar a versão publicada, de graça, para estudo, aula ou trabalho | Modificar, adaptar, traduzir ou criar obras derivadas |
+| Baixar o repositório ou uma versão de Releases e rodar no próprio computador, sem alterações | Vender, alugar, sublicenciar, cobrar pelo acesso ou incluir em produto ou serviço pago |
+| | Redistribuir, publicar, espelhar ou hospedar em outro endereço, mesmo sem alterações |
+| | Reutilizar o código, os textos, os dados das placas, os desenhos, os modelos 3D, o nome ou a logo |
+
+Cada cópia baixada é só para quem baixou e deve manter o arquivo [LICENSE](LICENSE). Os componentes de terceiros listados acima continuam sob as próprias licenças. Pedidos de autorização: pelo perfil [ravelroot](https://github.com/ravelroot) no GitHub.

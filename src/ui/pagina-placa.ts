@@ -32,42 +32,6 @@ export const ladrilho = (ctx: Contexto, lab: Laboratorio, sit: Situacao, extra?:
   );
 
 const montarHeroi = (ctx: Contexto, placa: Placa, labs: readonly Laboratorio[]): HTMLElement => {
-  const { loja } = ctx;
-  const progresso = h('div', { class: 'progresso' });
-  const desenharProgresso = (): void => {
-    if (labs.length === 0) {
-      trocar(progresso, h('p', { class: 'aviso-sem-labs' }, ui('semLabs')));
-      return;
-    }
-    const { bancada, feitos } = conjuntos(loja.atual);
-    const r = resumirBancada(labs, bancada, feitos);
-    const barra = h(
-      'div',
-      { class: 'progresso-barra', role: 'img', 'aria-label': `${r.feitos}/${r.total}` },
-      ...labs.map((l) => {
-        const seg = h('span', { class: `seg${feitos.has(l.id) ? ' feito' : ''}`, title: tr(l.titulo) });
-        estilo(seg, { '--cor-tema': CORES_TEMA[Math.max(0, placa.temas.findIndex((t) => t.id === l.tema)) % CORES_TEMA.length] ?? '#fff' });
-        return seg;
-      }),
-    );
-    trocar(
-      progresso,
-      h('div', { class: 'progresso-topo' }, h('span', { class: 'rotulo' }, ui('labsConcluidos')), h('span', { class: 'progresso-contagem mono' }, `${r.feitos}/${r.total}`)),
-      barra,
-      h(
-        'div',
-        { class: 'progresso-numeros' },
-        h('div', {}, h('strong', { class: 'mono' }, String(r.prontos.length)), h('span', {}, ui('naBancada'))),
-        h('div', {}, h('strong', { class: 'mono' }, String(r.feitos)), h('span', {}, ui('feitosPorVoce'))),
-        h('div', {}, h('strong', { class: 'mono' }, String(r.total - r.prontos.length)), h('span', {}, ui('faltamPecas'))),
-      ),
-    );
-  };
-  desenharProgresso();
-  vigiar(loja, progresso, (e, a) => {
-    if (e.bancada !== a.bancada || e.feitos !== a.feitos) desenharProgresso();
-  });
-
   const vizinhas = PLACAS.filter((p) => p.categoria === placa.categoria);
   const troca = h(
     'nav',
@@ -101,7 +65,7 @@ const montarHeroi = (ctx: Contexto, placa: Placa, labs: readonly Laboratorio[]):
         h('h1', { class: 'heroi-titulo' }, placa.sigla, labs.length ? h('span', { class: 'destaque' }, ' LABS') : null),
         h('p', { class: 'heroi-verbos' }, labs.length ? ui('verbos') : ui('verbosSemLab')),
         h('p', { class: 'heroi-resumo' }, tr(placa.resumo)),
-        progresso,
+        labs.length ? null : h('p', { class: 'aviso-sem-labs heroi-aviso' }, ui('semLabs')),
       ),
       ficha,
     ),
