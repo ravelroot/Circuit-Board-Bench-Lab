@@ -5,7 +5,7 @@ export interface Texto {
   readonly en: string;
 }
 
-export type Categoria = 'microcontrolador' | 'computador' | 'pc' | 'modulo' | 'circuito';
+export type Categoria = 'microcontrolador' | 'computador' | 'pc' | 'modulo' | 'sensor' | 'energia' | 'circuito';
 
 export type CorPlaca = 'verde' | 'azul' | 'preto' | 'vermelho' | 'roxo' | 'branco' | 'amarelo' | 'cinza' | 'marrom';
 

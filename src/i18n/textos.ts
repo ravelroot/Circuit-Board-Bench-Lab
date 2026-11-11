@@ -17,6 +17,7 @@ const textos = {
   atalhos: { pt: 'Atalhos de teclado', en: 'Keyboard shortcuts' },
   placas: { pt: 'Placas', en: 'Boards' },
   todasPlacas: { pt: 'Todas as placas', en: 'All boards' },
+  paginaInicial: { pt: 'Página inicial', en: 'Home' },
   catalogoTitulo: { pt: '{n} placas e circuitos', en: '{n} boards and circuits' },
   catalogoResumo: {
     pt: 'Escolha uma placa para girar em 3D, descobrir o que é cada peça e, quando houver, montar os laboratórios.',
@@ -181,6 +182,8 @@ const categorias: Record<Categoria, Texto> = {
   computador: { pt: 'Computadores de placa única', en: 'Single-board computers' },
   pc: { pt: 'Hardware de PC', en: 'PC hardware' },
   modulo: { pt: 'Módulos', en: 'Modules' },
+  sensor: { pt: 'Sensores', en: 'Sensors' },
+  energia: { pt: 'Energia', en: 'Power' },
   circuito: { pt: 'Circuitos', en: 'Circuits' },
 };
 
@@ -200,4 +203,4 @@ export const ui = (chave: ChaveTexto, valores: Record<string, string | number> =
 
 export const nomeCategoria = (c: Categoria): string => categorias[c][atual];
 
-export const ORDEM_CATEGORIAS: readonly Categoria[] = ['microcontrolador', 'computador', 'pc', 'modulo', 'circuito'];
+export const ORDEM_CATEGORIAS: readonly Categoria[] = ['microcontrolador', 'computador', 'pc', 'modulo', 'sensor', 'energia', 'circuito'];

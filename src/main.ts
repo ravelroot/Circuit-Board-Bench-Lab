@@ -5,7 +5,7 @@ import { criarEstado, Loja, type Rota } from './app/estado';
 import { caminho, lerRota, mesmaRota } from './app/rotas';
 import { labPorId, labsDaPlaca } from './dados/laboratorios';
 import { pecaPorId } from './dados/pecas';
-import { placaPorId, PLACAS } from './dados/placas';
+import { PLACA_INICIAL, placaPorId, PLACAS } from './dados/placas';
 import { definirIdioma, ui } from './i18n/textos';
 import { montarCabecalho } from './ui/cabecalho';
 import { montarCatalogo } from './ui/catalogo';
@@ -18,7 +18,7 @@ import { montarPaginaPlaca } from './ui/pagina-placa';
 const catalogo = {
   placa: (id: string) => placaPorId(id) !== undefined,
   lab: (placa: string, lab: string) => labPorId(lab)?.placa === placa,
-  inicial: PLACAS[0]?.id ?? 'esp32-s3',
+  inicial: PLACA_INICIAL,
 };
 
 const loja = new Loja(

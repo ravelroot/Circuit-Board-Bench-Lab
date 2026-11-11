@@ -1,14 +1,24 @@
 import { nomePaleta, PALETA_PADRAO, PALETAS } from '../app/aparencia';
 import type { Contexto } from '../app/contexto';
-import { placaPorId, PLACAS } from '../dados/placas';
+import type { Rota } from '../app/estado';
+import { caminho, mesmaRota } from '../app/rotas';
+import { PLACA_INICIAL, placaPorId, PLACAS } from '../dados/placas';
 import { ui } from '../i18n/textos';
 import { MARCA } from '../marca';
 import { h, trocar } from './dom';
 import { icone, logotipo } from './icones';
 import { abrirMenu } from './menu';
 
+const INICIO: Rota = { pagina: 'placa', placa: PLACA_INICIAL, lab: null };
+
 export const montarCabecalho = (ctx: Contexto): HTMLElement => {
   const { loja } = ctx;
+  const irParaInicio = (ev: Event): void => {
+    ev.preventDefault();
+    loja.alterar({ busca: false, ajuda: false });
+    if (mesmaRota(loja.atual.rota, INICIO)) window.scrollTo({ top: 0, behavior: 'smooth' });
+    else ctx.navegar(INICIO);
+  };
   const slogan = h('small', { class: 'marca-slogan' });
   const rotuloPlaca = h('span', { class: 'rotulo' });
   const nomePlaca = h('span', { class: 'placa-atual-nome' });
@@ -34,10 +44,12 @@ export const montarCabecalho = (ctx: Contexto): HTMLElement => {
     ),
   );
 
+  const marca = h('a', { class: 'marca', href: caminho(INICIO), onclick: irParaInicio }, h('span', { class: 'marca-quadro' }, logotipo()), h('span', { class: 'marca-texto' }, h('strong', { class: 'marca-nome' }, MARCA.nome), slogan));
+
   const cabecalho = h(
     'header',
     { class: 'cabecalho' },
-    h('a', { class: 'marca', href: '#/placas' }, h('span', { class: 'marca-quadro' }, logotipo()), h('span', { class: 'marca-texto' }, h('strong', { class: 'marca-nome' }, MARCA.nome), slogan)),
+    marca,
     seletor,
     h('div', { class: 'espaco' }),
     gatilhoBusca,
@@ -52,6 +64,8 @@ export const montarCabecalho = (ctx: Contexto): HTMLElement => {
     const e = loja.atual;
     const placa = placaPorId(e.rota.placa);
     slogan.textContent = ui('slogan');
+    marca.title = ui('paginaInicial');
+    marca.setAttribute('aria-label', `${MARCA.nome} · ${ui('paginaInicial')}`);
     rotuloPlaca.textContent = placa ? ui('placas') : ui('todasPlacas');
     nomePlaca.textContent = placa ? placa.nome : ui('catalogoTitulo', { n: PLACAS.length });
     contagem.textContent = placa ? `${PLACAS.indexOf(placa) + 1}/${PLACAS.length}` : String(PLACAS.length);

@@ -1,0 +1,125 @@
+import { c, espec, parte, ROTULOS as R, t } from '../base';
+import type { Placa } from '../tipos';
+import { fila, furo } from './formas';
+
+export const MICROSD: Placa = {
+  id: 'microsd',
+  nome: 'Leitor de cartão microSD',
+  sigla: 'MICROSD',
+  fabricante: t('Genérico', 'Generic'),
+  categoria: 'modulo',
+  resumo: t('Slot de microSD com regulador e conversor de nível: gigabytes de armazenamento por SPI.', 'A microSD slot with a regulator and level shifter: gigabytes of storage over SPI.'),
+  usos: t('Registradores de dados, arquivos de configuração, áudio e imagens para telas.', 'Data loggers, config files, audio and images for screens.'),
+  essenciais: t('o módulo, um cartão formatado em FAT32 e um microcontrolador', 'the module, a FAT32-formatted card and a microcontroller'),
+  especificacoes: [
+    espec(R.interface, 'SPI'),
+    espec(t('Cartões', 'Cards'), t('microSD e microSDHC em FAT32', 'microSD and microSDHC in FAT32')),
+    espec(R.logica, t('5 V, convertida para 3,3 V', '5 V, shifted to 3.3 V')),
+    espec(R.componente, 'AMS1117-3.3 + 74LVC125A'),
+    espec(R.tamanho, '≈ 42 × 24 mm'),
+  ],
+  desenho: {
+    largura: 42,
+    altura: 24,
+    cor: 'azul',
+    componentes: [
+      fila('barra', 0.3, 4.38, 6, 'pinos', true),
+      c('chip', 6, 2.5, 6.5, 7, 1.6, 'regulador', 'AMS1117'),
+      c('chip', 5.5, 14.5, 8.6, 3.9, 1.6, 'nivel', 'LVC125'),
+      c('resistor', 16, 4, 1.6, 0.8, 0.5, 'pullups'),
+      c('resistor', 16, 18, 1.6, 0.8, 0.5, 'pullups'),
+      c('metal', 22, 4.5, 15, 14.5, 1.8, 'slot', 'microSD'),
+      furo(38.6, 0.8, 2.5),
+      furo(38.6, 20.7, 2.5),
+    ],
+  },
+  partes: [
+    parte('pinos', t('GND, VCC, MISO, MOSI, SCK e CS', 'GND, VCC, MISO, MOSI, SCK and CS'), t('Barra de seis pinos.', 'A six-pin header.'), t('CS escolhe o cartão quando o SPI é dividido.', 'CS selects the card on a shared SPI bus.')),
+    parte('regulador', t('Regulador de 3,3 V', '3.3 V regulator'), t('AMS1117.', 'An AMS1117.'), t('Cartões SD só aceitam 3,3 V.', 'SD cards only take 3.3 V.')),
+    parte('nivel', t('Conversor de nível', 'Level shifter'), t('Buffer 74LVC125A.', 'A 74LVC125A buffer.'), t('Baixa os sinais de 5 V do Arduino para o cartão.', 'It drops the Arduino’s 5 V signals for the card.')),
+    parte('pullups', t('Pull-ups', 'Pull-ups'), t('Resistores nas linhas.', 'Resistors on the lines.'), t('Mantêm o cartão estável na inicialização.', 'They keep the card stable at start-up.')),
+    parte('slot', t('Slot microSD', 'microSD slot'), t('Soquete push-push metálico.', 'A metal push-push socket.'), t('Empurre para travar e para soltar o cartão.', 'Push to lock and to release the card.')),
+  ],
+  temas: [],
+};
+
+export const DS3231: Placa = {
+  id: 'ds3231',
+  nome: 'Relógio de tempo real DS3231',
+  sigla: 'DS3231',
+  fabricante: t('Analog Devices / genérico', 'Analog Devices / generic'),
+  categoria: 'modulo',
+  resumo: t('Relógio com cristal compensado por temperatura: erra cerca de um minuto por ano e lembra a hora sem energia.', 'A temperature-compensated clock: it drifts about a minute a year and keeps time without power.'),
+  usos: t('Datar registros, despertadores, irrigação programada e qualquer projeto sem internet que precise da hora.', 'Timestamping logs, alarm clocks, scheduled irrigation and any offline project that needs the time.'),
+  essenciais: t('o módulo, uma bateria CR2032 e um microcontrolador com I²C', 'the module, a CR2032 cell and a microcontroller with I²C'),
+  especificacoes: [
+    espec(R.componente, 'DS3231SN + AT24C32'),
+    espec(t('Precisão', 'Accuracy'), t('±2 ppm (≈ 1 min por ano) de 0 a 40 °C', '±2 ppm (≈ 1 min a year) from 0 to 40 °C')),
+    espec(R.interface, t('I²C: 0x68 relógio, 0x57 EEPROM', 'I²C: 0x68 clock, 0x57 EEPROM')),
+    espec(t('Reserva', 'Backup'), t('CR2032 mantém a hora desligado', 'a CR2032 keeps time while off')),
+    espec(R.tensao, '3,3 – 5,5 V'),
+  ],
+  desenho: {
+    largura: 38,
+    altura: 22,
+    cor: 'azul',
+    componentes: [
+      fila('barra', 0.3, 3.38, 6, 'pinos', true),
+      c('resistor', 6, 1.5, 1.6, 0.8, 0.5, 'carga', '201'),
+      c('diodo', 9, 1.4, 2.6, 1.4, 1, 'carga'),
+      c('chip', 6, 6, 10.3, 7.5, 2.4, 'rtc', 'DS3231'),
+      c('led', 6.5, 17.5, 1.6, 1, 0.6, 'led', undefined, '#ff3b30'),
+      c('chip', 15, 16, 5, 4, 1.6, 'eeprom', '24C32'),
+      c('bateria', 21.5, 4.5, 13, 13, 3.2, 'bateria'),
+      fila('barra', 35.3, 5.92, 4, 'passagem', true),
+    ],
+  },
+  partes: [
+    parte('pinos', t('32K, SQW, SCL, SDA, VCC e GND', '32K, SQW, SCL, SDA, VCC and GND'), t('Barra de seis pinos.', 'A six-pin header.'), t('SQW pode gerar um alarme ou um pulso por segundo.', 'SQW can raise an alarm or a once-per-second pulse.')),
+    parte('carga', t('Circuito de carga', 'Charging circuit'), t('Resistor e diodo para a bateria.', 'A resistor and a diode for the cell.'), t('Foi feito para LIR2032 recarregável; com CR2032 comum, retire o resistor.', 'It was made for a rechargeable LIR2032; with a plain CR2032, remove the resistor.')),
+    parte('rtc', t('DS3231', 'DS3231'), t('Relógio com cristal e sensor de temperatura no mesmo chip.', 'A clock with the crystal and a temperature sensor in one chip.'), t('Corrige a frequência pela temperatura a cada 64 s.', 'It corrects the frequency for temperature every 64 s.')),
+    parte('led', t('LED de energia', 'Power LED'), t('LED vermelho.', 'A red LED.'), t('Acende com VCC ligado.', 'It lights with VCC on.')),
+    parte('eeprom', t('EEPROM AT24C32', 'AT24C32 EEPROM'), t('4 KB de memória não volátil.', '4 KB of non-volatile memory.'), t('Guarda configurações e registros pequenos.', 'It stores settings and small logs.')),
+    parte('bateria', t('Suporte CR2032', 'CR2032 holder'), t('Na traseira da placa.', 'On the back of the board.'), t('Mantém o relógio andando por anos sem energia externa.', 'It keeps the clock running for years without external power.')),
+    parte('passagem', t('Pinos de passagem', 'Pass-through pins'), t('SCL, SDA, VCC e GND.', 'SCL, SDA, VCC and GND.'), t('Levam o I²C para o próximo módulo.', 'They carry I²C on to the next module.')),
+  ],
+  temas: [],
+};
+
+export const DFPLAYER: Placa = {
+  id: 'dfplayer',
+  nome: 'Tocador de MP3 DFPlayer Mini',
+  sigla: 'DFPLAYER',
+  fabricante: 'DFRobot',
+  categoria: 'modulo',
+  resumo: t('Toca MP3 de um cartão microSD e já tem amplificador para um alto-falante pequeno.', 'Plays MP3s from a microSD card and has an amplifier for a small speaker.'),
+  usos: t('Brinquedos falantes, avisos sonoros, campainhas, totens e jukeboxes.', 'Talking toys, voice prompts, doorbells, kiosks and jukeboxes.'),
+  essenciais: t('o módulo, um cartão microSD, um alto-falante de 3 W e um microcontrolador', 'the module, a microSD card, a 3 W speaker and a microcontroller'),
+  especificacoes: [
+    espec(R.componente, t('decodificador YX5200 e amplificador 8002', 'YX5200 decoder and 8002 amplifier')),
+    espec(t('Formatos', 'Formats'), 'MP3, WAV, WMA'),
+    espec(t('Saída', 'Output'), t('alto-falante de até 3 W ou fone', 'up to 3 W speaker or headphones')),
+    espec(R.interface, t('UART a 9600 bps ou botões', 'UART at 9600 bps or buttons')),
+    espec(R.tensao, '3,2 – 5 V'),
+    espec(R.tamanho, '20 × 20 mm'),
+  ],
+  desenho: {
+    largura: 20.3,
+    altura: 20.3,
+    cor: 'roxo',
+    componentes: [
+      fila('barra', 0, 0, 8, 'pinos', true),
+      fila('barra', 17.76, 0, 8, 'pinos', true),
+      c('chip', 4, 4, 8, 5.3, 1.6, 'decodificador', 'YX5200'),
+      c('chip', 4, 12, 5, 4, 1.6, 'amplificador', '8002'),
+      c('metal', 3, 2.5, 14, 15, 1.8, 'slot', 'microSD'),
+    ],
+  },
+  partes: [
+    parte('pinos', t('16 pinos', '16 pins'), t('VCC, RX, TX, DAC, SPK, botões e BUSY.', 'VCC, RX, TX, DAC, SPK, buttons and BUSY.'), t('Com Arduino de 5 V, ponha 1 kΩ em série no RX para evitar chiado.', 'With a 5 V Arduino, put 1 kΩ in series on RX to avoid hiss.')),
+    parte('decodificador', t('YX5200', 'YX5200'), t('Decodificador de áudio, sob o slot.', 'An audio decoder, under the slot.'), t('Lê o cartão e transforma o MP3 em áudio.', 'It reads the card and turns MP3 into audio.')),
+    parte('amplificador', t('Amplificador 8002', '8002 amplifier'), t('Classe AB de 3 W.', 'A 3 W class-AB amp.'), t('Liga o alto-falante direto em SPK1 e SPK2.', 'It drives the speaker straight from SPK1 and SPK2.')),
+    parte('slot', t('Slot microSD', 'microSD slot'), t('Soquete na face de cima.', 'A socket on the top face.'), t('Pastas 01, 02… e arquivos 001.mp3 facilitam escolher a faixa.', 'Folders 01, 02… and files 001.mp3 make track selection easy.')),
+  ],
+  temas: [],
+};

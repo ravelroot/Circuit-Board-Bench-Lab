@@ -1,4 +1,4 @@
-import type { Componente, CorPlaca, Placa } from '../dados/tipos';
+import type { Categoria, Componente, CorPlaca, Placa } from '../dados/tipos';
 import type { Acabamento, Antena, Footprint, Furo, MatrizPads, Modelo, Pad, ProjetoPcb, Retangulo, Segmento, TextoSerigrafia, Trilha, Via } from './modelo';
 
 export const COR_MASCARA: Record<CorPlaca, string> = {
@@ -44,6 +44,8 @@ const rectSilk = (r: Retangulo, folga: number): Segmento[] => {
   ];
 };
 
+const MODULARES: ReadonlySet<Categoria> = new Set(['modulo', 'sensor', 'energia']);
+
 export const classificar = (c: Componente, placa: Placa): Modelo => {
   const menor = Math.min(c.l, c.a);
   const maior = Math.max(c.l, c.a);
@@ -58,7 +60,7 @@ export const classificar = (c: Componente, placa: Placa): Modelo => {
       return menor >= 9 ? 'bga' : 'qfn';
     case 'metal':
       if (/^(GPU|BCM|RP3A0|RP1)/.test(c.rotulo ?? '')) return 'bga';
-      return maior <= 16 && c.z <= 2.4 && placa.categoria !== 'modulo' && !c.rotulo?.includes('-') && !/WROOM|ESP|NEO|CAM|SD/i.test(c.rotulo ?? '') ? 'bga' : 'blindagem';
+      return maior <= 16 && c.z <= 2.4 && !MODULARES.has(placa.categoria) && !c.rotulo?.includes('-') && !/WROOM|ESP|NEO|CAM|SD|CYW|MDBT/i.test(c.rotulo ?? '') ? 'bga' : 'blindagem';
     case 'conector':
       return 'conector';
     case 'botao':
@@ -403,7 +405,7 @@ const rotaOctilinear = (x1: number, y1: number, x2: number, y2: number, inverter
   const sx = Math.sign(dx);
   const sy = Math.sign(dy);
   const diag = Math.min(adx, ady);
-  if (diag < 0.01 || Math.abs(adx - ady) < 0.01) return [[x1, y1], [x2, y2]];
+  if (diag < 1e-6 || Math.abs(adx - ady) < 1e-6) return [[x1, y1], [x2, y2]];
   if (adx > ady) {
     const reto = adx - diag;
     return inverter ? [[x1, y1], [x1 + sx * diag, y1 + sy * diag], [x2, y2]] : [[x1, y1], [x1 + sx * reto, y1], [x2, y2]];
@@ -539,9 +541,9 @@ export const projetoDe = (placa: Placa): ProjetoPcb => {
         const oitavo = Math.round(Math.atan2(pb.y - pa.y, pb.x - pa.x) / (Math.PI / 4));
         const passoX = Math.round(Math.cos((oitavo * Math.PI) / 4));
         const passoY = Math.round(Math.sin((oitavo * Math.PI) / 4));
-        const desloc = (1.4 * s) / (passoX && passoY ? Math.SQRT2 : 1);
-        const v1: [number, number] = [arred(pa.x + passoX * desloc), arred(pa.y + passoY * desloc)];
-        const v2: [number, number] = [arred(pb.x - passoX * desloc), arred(pb.y - passoY * desloc)];
+        const desloc = arred((1.4 * s) / (passoX && passoY ? Math.SQRT2 : 1));
+        const v1: [number, number] = [pa.x + passoX * desloc, pa.y + passoY * desloc];
+        const v2: [number, number] = [pb.x - passoX * desloc, pb.y - passoY * desloc];
         if (!dentro(v1[0], v1[1]) || !dentro(v2[0], v2[1])) continue;
         trilhas.push({ pontos: [[pa.x, pa.y], v1], largura, camada: 'F.Cu' });
         trilhas.push({ pontos: rotaOctilinear(v1[0], v1[1], v2[0], v2[1], inverter), largura, camada: 'B.Cu' });

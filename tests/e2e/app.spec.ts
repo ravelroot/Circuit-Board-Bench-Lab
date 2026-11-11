@@ -54,9 +54,10 @@ test('o editor de PCB liga e desliga camadas', async ({ page }) => {
   await expect(page.locator('.editor-svg .k-pad-tht').first()).toBeAttached();
 });
 
-test('o catálogo mostra as 32 placas e abre uma delas', async ({ page }) => {
+test('o catálogo mostra as 132 placas em sete categorias e abre uma delas', async ({ page }) => {
   await page.goto('./#/placas');
-  await expect(page.locator('.cartao-placa')).toHaveCount(32);
+  await expect(page.locator('.cartao-placa')).toHaveCount(132);
+  await expect(page.locator('.catalogo-grupo')).toHaveCount(7);
   await page.locator('.cartao-placa[data-placa="gpu"]').click();
   await expect(page).toHaveURL(/#\/gpu$/);
   await expect(page.locator('.aviso-sem-labs')).toBeVisible();
@@ -133,4 +134,27 @@ test('mostra a marca e a barra de status', async ({ page }) => {
   await expect(page.locator('.marca-nome')).toHaveText('Rumo');
   await expect(page.locator('.heroi-titulo')).toHaveText('ESP32-S3 Labs');
   await expect(page.locator('.barra-status')).toContainText('ESP32-S3 DevKitC-1');
+});
+
+test('o logo Rumo volta para a página inicial de qualquer lugar', async ({ page }) => {
+  await page.goto('./#/placas');
+  await page.locator('.cabecalho .marca').click();
+  await expect(page).toHaveURL(/#\/esp32-s3$/);
+  await expect(page.locator('.heroi-titulo')).toContainText('ESP32-S3');
+  await page.goto('./#/uno-r3/uno-blink');
+  await page.locator('.cabecalho .marca').click();
+  await expect(page).toHaveURL(/#\/esp32-s3$/);
+  await page.mouse.wheel(0, 1500);
+  await page.locator('.cabecalho .marca').click();
+  await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(0);
+  await page.goBack();
+  await expect(page).toHaveURL(/#\/uno-r3\/uno-blink$/);
+});
+
+test('as novas placas abrem com vista 3D e editor de PCB', async ({ page }) => {
+  for (const id of ['pi4', 'tmc2209', 'bme280', 'mt3608', 'teclado-60', 'meio-somador']) {
+    await page.goto(`./#/${id}`);
+    await expect(page.locator('.visor3d canvas')).toBeVisible();
+    await expect(page.locator('.visor3d-status')).toContainText(`${id}.kicad_pcb`);
+  }
 });

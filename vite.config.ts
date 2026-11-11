@@ -32,6 +32,16 @@ export default defineConfig({
     assetsInlineLimit: 0,
     cssCodeSplit: false,
     chunkSizeWarningLimit: 900,
+    rolldownOptions: {
+      output: {
+        codeSplitting: {
+          groups: [
+            { name: 'three', test: /[\\/]node_modules[\\/]three[\\/]/ },
+            { name: 'placas', test: /[\\/]src[\\/]dados[\\/]placas[\\/]/ },
+          ],
+        },
+      },
+    },
   },
   test: {
     include: ['tests/unit/**/*.test.ts'],

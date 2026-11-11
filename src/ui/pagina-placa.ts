@@ -42,6 +42,14 @@ const montarHeroi = (ctx: Contexto, placa: Placa, labs: readonly Laboratorio[]):
     h('a', { class: 'chip-placa todas', href: '#/placas', onclick: (ev: Event) => { ev.preventDefault(); ctx.navegar({ pagina: 'catalogo', placa: null, lab: null }); } }, icone('grade', 'icone mini'), ui('catalogoTitulo', { n: PLACAS.length })),
   );
 
+  requestAnimationFrame(() => {
+    const atual = troca.querySelector<HTMLElement>('.atual');
+    if (!atual || !troca.isConnected) return;
+    const caixa = troca.getBoundingClientRect();
+    const chip = atual.getBoundingClientRect();
+    troca.scrollLeft += chip.left - caixa.left - (caixa.width - chip.width) / 2;
+  });
+
   const ficha = h(
     'aside',
     { class: 'ficha' },

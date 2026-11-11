@@ -1,18 +1,33 @@
 import { describe, expect, it } from 'vitest';
-import { PLACAS, placaPorId } from '../../src/dados/placas';
+import { PLACA_INICIAL, PLACAS, placaPorId } from '../../src/dados/placas';
+import { ORDEM_CATEGORIAS } from '../../src/i18n/textos';
 import type { Texto } from '../../src/dados/tipos';
 
 const bilingue = (t: Texto | string): boolean => (typeof t === 'string' ? t.trim().length > 0 : t.pt.trim().length > 0 && t.en.trim().length > 0);
 
 describe('catálogo de placas', () => {
-  it('tem pelo menos 30 placas e circuitos com ids únicos', () => {
-    expect(PLACAS.length).toBeGreaterThanOrEqual(30);
+  it('tem pelo menos 132 placas e circuitos com ids únicos', () => {
+    expect(PLACAS.length).toBeGreaterThanOrEqual(132);
     expect(new Set(PLACAS.map((p) => p.id)).size).toBe(PLACAS.length);
   });
 
-  it('cobre as cinco categorias', () => {
+  it('cobre as sete categorias', () => {
     const categorias = new Set(PLACAS.map((p) => p.categoria));
-    expect([...categorias].sort()).toEqual(['circuito', 'computador', 'microcontrolador', 'modulo', 'pc']);
+    expect([...categorias].sort()).toEqual(['circuito', 'computador', 'energia', 'microcontrolador', 'modulo', 'pc', 'sensor']);
+  });
+
+  it('mostra no catálogo todas as categorias usadas, cada uma com pelo menos dez placas', () => {
+    for (const cat of new Set(PLACAS.map((p) => p.categoria))) expect(ORDEM_CATEGORIAS).toContain(cat);
+    for (const cat of ORDEM_CATEGORIAS) expect(PLACAS.filter((p) => p.categoria === cat).length, cat).toBeGreaterThanOrEqual(10);
+  });
+
+  it('começa pela ESP32-S3, que é a página inicial', () => {
+    expect(PLACA_INICIAL).toBe('esp32-s3');
+    expect(PLACAS[0]?.id).toBe(PLACA_INICIAL);
+  });
+
+  it('usa ids seguros para a rota', () => {
+    for (const p of PLACAS) expect(p.id).toMatch(/^[a-z0-9-]{2,48}$/);
   });
 
   it('acha placas pelo id', () => {
