@@ -20,8 +20,8 @@ export const montarBarraStatus = (ctx: Contexto): HTMLElement => {
       esquerda,
       h('span', {}, `${MARCA.nome} ${MARCA.versao}`),
       h('span', {}, local),
-      h('span', {}, ui('pecasNaBancada', { n: e.bancada.length })),
-      h('span', {}, ui('labsConcluidos', { n: e.feitos.length })),
+      h('span', {}, e.bancada.length === 1 ? ui('pecasNaBancadaUm') : ui('pecasNaBancada', { n: e.bancada.length })),
+      h('span', {}, e.feitos.length === 1 ? ui('labsConcluidosUm') : ui('labsConcluidos', { n: e.feitos.length })),
     );
     trocar(
       direita,

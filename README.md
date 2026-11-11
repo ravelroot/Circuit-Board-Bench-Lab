@@ -23,7 +23,9 @@
 
 > **Banco de dados:** [`Banco-de-Dados-Rumo.pdf`](Banco-de-Dados-Rumo.pdf) traz a sugestão de arquitetura para quando o catálogo sair dos arquivos TypeScript e passar para um banco, com contas e progresso sincronizado: o diagrama de relacionamentos, todas as tabelas com campos, tipos, chaves e restrições (inclusive footprints, pads, trilhas e vias do projeto de PCB), os índices, as decisões (PostgreSQL, textos bilíngues, geometria em JSONB, versões publicadas), os fluxos de dados, a operação e como escalar (cópia em [`docs/`](docs/Banco-de-Dados-Rumo.pdf)).
 
-> **Versão 1.3.0 (Atual):** **100 placas novas**, de 32 para **132**, em **sete categorias**: 20 microcontroladores (Arduino Leonardo, Uno R4 Minima e WiFi, Nano Every, Nano 33 IoT, Nano ESP32, Due e Portenta H7, ESP32 DevKitC, ESP32-C6, D1 mini, XIAO ESP32S3, Heltec LoRa 32, Pico W, Pico 2, Feather nRF52840, Nucleo-F401RE, Black Pill, Teensy 4.1 e Digispark), 8 computadores de placa única (Raspberry Pi 4, 3B+, 3A+, CM4 e Zero W, BeagleBone Black, Jetson Nano e Orange Pi 5), 10 peças de PC, 20 módulos, 22 sensores, 10 módulos de energia e 10 circuitos de bancada. Os sensores e a energia ganharam categorias próprias no catálogo. Cada placa nova tem ficha técnica, partes com "o que é" e "para que serve", modelo 3D e projeto de PCB. Clicar no **logo Rumo** agora volta para a **página inicial** de qualquer lugar (e, se você já estiver nela, sobe ao topo). A troca de placa centraliza a placa atual, o build separa o three.js e o catálogo em arquivos próprios e o gerador de PCB ficou mais preciso nas trilhas a 45°.
+> **Versão 1.4.0 (Atual):** em telas largas, as **laterais** viram ferramentas. À esquerda, um **navegador de placas** fixo mostra as sete categorias e as 132 placas, com filtro por nome, a placa aberta marcada e o número de labs de cada uma; ele substitui a fileira de chips no alto da página. À direita, o painel **Nesta página** acompanha a rolagem e leva a cada seção, junto com o **seu progresso** (labs feitos, prontos para montar, peças na bancada e o próximo lab sugerido) e a **placa anterior e a próxima**. Num lab, a lateral mostra os passos marcados e todos os labs da placa com a situação de cada um; no catálogo, as categorias, os números do Rumo e o progresso geral. O conteúdo passa a ocupar a largura disponível até 1.680 px, as miniaturas do catálogo começam pelas que estão na tela, os títulos longos dos labs quebram com hífen e a barra de status usa o singular quando é uma peça ou um lab. Em telas menores, tudo continua como antes.
+
+> **Versão 1.3.0:** **100 placas novas**, de 32 para **132**, em **sete categorias**: 20 microcontroladores (Arduino Leonardo, Uno R4 Minima e WiFi, Nano Every, Nano 33 IoT, Nano ESP32, Due e Portenta H7, ESP32 DevKitC, ESP32-C6, D1 mini, XIAO ESP32S3, Heltec LoRa 32, Pico W, Pico 2, Feather nRF52840, Nucleo-F401RE, Black Pill, Teensy 4.1 e Digispark), 8 computadores de placa única (Raspberry Pi 4, 3B+, 3A+, CM4 e Zero W, BeagleBone Black, Jetson Nano e Orange Pi 5), 10 peças de PC, 20 módulos, 22 sensores, 10 módulos de energia e 10 circuitos de bancada. Os sensores e a energia ganharam categorias próprias no catálogo. Cada placa nova tem ficha técnica, partes com "o que é" e "para que serve", modelo 3D e projeto de PCB. Clicar no **logo Rumo** agora volta para a **página inicial** de qualquer lugar (e, se você já estiver nela, sobe ao topo). A troca de placa centraliza a placa atual, o build separa o three.js e o catálogo em arquivos próprios e o gerador de PCB ficou mais preciso nas trilhas a 45°.
 
 > **Versão 1.2.1:** o **menu de paletas** mostra só as amostras de cor de cada paleta, sem o nome. A paleta em uso continua marcada, a tecla `C` continua passando para a próxima e o nome segue no leitor de tela, na dica do botão e na barra de status. As placas, os labs, a bancada e o progresso salvo não mudam.
 
@@ -46,11 +48,16 @@
 - **Mapa de laboratórios:** os labs da placa agrupados por tema, com o estado de cada um (feito por você, pronto na bancada, falta uma peça, faltam peças).
 - **Lab completo em seis abas:** Como (a teoria em blocos curtos), Fiação (diagrama animado fio a fio com anterior, tocar, próximo e mostrar todos, mais a tabela de pinos), Comandos (prontos para copiar), Passos (checklist salvo no navegador que marca o lab como feito), Prévia (o simulador) e Código (com botão de copiar). A barra de abas acompanha a rolagem e o rodapé leva ao próximo lab ou ao próximo tema.
 - **16 simuladores:** monitor serial com comandos e LED (cores, pisca, respiração e SOS), varredura de Wi-Fi com canais e sinal, radar Bluetooth, sintetizador com teclado, formas de onda e som de verdade pelo Web Audio, escopo de dois microfones com bias e comparador, leitor RFID com memória do cartão e créditos, tela ST7789 e LCD 16×2, PWM, servo, ultrassom, mapa dos 40 pinos do Raspberry Pi, slots de memória em dual channel, LEDs de POST com cenários de falha, temporizador 555, regulador 7805 com calor e ponte H.
+- **Laterais em telas largas:** a partir de 1.500 px, a lateral esquerda vira um navegador fixo com as sete categorias e as 132 placas, filtro por nome (sem ligar para acentos), a placa aberta marcada e o número de labs de cada uma. A partir de 1.780 px, a lateral direita mostra o índice **Nesta página**, que acompanha a rolagem, o seu progresso na placa, o próximo lab sugerido e as placas vizinhas; num lab, os passos marcados e todos os labs da placa com a situação de cada um; no catálogo, as categorias, os números do Rumo e o progresso geral.
 - **Busca e atalhos:** o logo Rumo, no canto superior esquerdo, volta para a página inicial de qualquer lugar. `Ctrl` + `K` ou `/` busca placas, partes e labs nas duas línguas. `,` e `.` trocam de placa, `[` e `]` trocam de lab, `P` abre o catálogo, `C` troca a paleta e `?` mostra todos os atalhos. Com a vista 3D em foco, as setas giram a placa e `E` separa as peças.
 - **Idiomas, temas e paletas:** português e inglês em todo o conteúdo, tema claro e escuro (a primeira visita segue o tema do sistema) e quatro paletas de cores: Rumo, Bento, Sonda e Nexo. A escolha, as peças da bancada e os passos marcados ficam salvos no navegador. Detalhes em [Paletas de cores](#paletas-de-cores).
 - **Barra de status:** no rodapé, a versão, a placa ou o lab abertos, quantas peças estão na bancada, quantos labs foram concluídos, o tema e a paleta.
 - **Projeto de PCB gerado para cada placa:** 1.783 footprints com referências e bibliotecas no padrão do KiCad, mais de 21 mil pads, 4.149 trilhas e 2.642 vias, gerados de forma determinística a partir do desenho de cada placa.
 - **Endereço por placa e por lab:** por exemplo, `#/atx` ou `#/esp32-s3/rfid-rc522`, bons para compartilhar ou usar em aula.
+
+<p align="center">
+  <img src="docs/images/tela-laterais.png" alt="ESP32-S3 numa tela larga, com o navegador de placas à esquerda e, à direita, o índice da página, o progresso e as placas vizinhas">
+</p>
 
 <p align="center">
   <img src="docs/images/tela-editor-pcb.png" alt="Arduino Uno R3 no editor de PCB no estilo KiCad, no tema escuro, com o ATmega328P selecionado e as propriedades do footprint">
@@ -104,6 +111,7 @@ flowchart LR
     LABS["dados/laboratorios<br/>25 labs: fiação, comandos,<br/>passos, prévia e código"] --> PAGINAS["Páginas<br/>catálogo, placa e lab"]
     PECAS["dados/pecas<br/>peças da bancada"] --> PROG["Progresso<br/>bancada, situação<br/>e resumo"]
     PROG --> PAGINAS
+    PROG --> LAT["Laterais<br/>placas, índice<br/>e progresso"]
     VISOR --> PAGINAS
     LOJA["Loja de estado<br/>rota, idioma, tema e<br/>progresso salvo"] --> PAGINAS
     PAGINAS --> SIM["16 simuladores"]
@@ -115,19 +123,20 @@ flowchart LR
 | `src/dados/placas` | As 132 placas, em arquivos por categoria e família, os atalhos de desenho (`formas.ts`) e o catálogo ordenado, com a placa inicial |
 | `src/dados/laboratorios` | Os 25 labs e as consultas por placa |
 | `src/dados/pecas.ts` | As peças da bancada |
-| `src/app` | Estado com leitura validada do navegador, aparência (tema e paleta), rotas e cálculo da bancada |
+| `src/app` | Estado com leitura validada do navegador, aparência (tema e paleta), rotas, navegador de placas (filtro, vizinhas e seção atual) e cálculo da bancada |
 | `src/ui/cabecalho.ts` | Barra superior: logo que leva à página inicial, placa atual, busca, idioma, paleta e tema |
+| `src/ui/laterais.ts` | Laterais das telas largas: navegador de placas, índice da página com a seção atual, progresso, labs da placa e placas vizinhas |
 | `src/pcb` | O modelo de um projeto de PCB (footprints, pads, trilhas, vias, furos e textos) e o gerador determinístico que classifica cada componente e monta o projeto |
 | `src/ui/kicad/janela.ts` | A janela com as abas Visualizador 3D e Editor de PCB |
 | `src/ui/kicad/visor3d.ts`, `cena.ts`, `modelos3d.ts`, `texturas.ts` | O visualizador 3D em WebGL: cena, luzes e ambiente, modelos dos componentes, texturas da face (máscara, cobre, serigrafia e acabamento), vistas, explosão, seleção e posição de cada parte na tela |
 | `src/ui/kicad/editor2d.ts` | O editor de PCB em SVG: camadas, zonas, grade, cursor, painel de aparência e de propriedades |
-| `src/ui/kicad/miniaturas.ts` | As miniaturas 3D do catálogo, renderizadas sob demanda e guardadas em memória |
+| `src/ui/kicad/miniaturas.ts` | As miniaturas 3D do catálogo, renderizadas sob demanda, começando pelas que estão na tela, e guardadas em memória |
 | `src/ui/pagina-placa.ts`, `pagina-lab.ts`, `catalogo.ts` | As três páginas |
 | `src/ui/fiacao.ts` | Diagrama de fiação animado e tabela de pinos |
 | `src/ui/simuladores` | Os 16 simuladores |
 | `src/i18n/textos.ts` | Textos da interface em português e inglês |
 | `src/css/estilo.css` | Tokens das quatro paletas nos dois temas, layout, janela no estilo KiCad, páginas, simuladores e responsivo |
-| `tests/unit` | Catálogo, partes desenhadas, projetos de PCB, labs, bancada, progresso salvo e rotas |
+| `tests/unit` | Catálogo, partes desenhadas, projetos de PCB, labs, bancada, progresso salvo, rotas e navegador de placas |
 | `tests/e2e` | Interface de ponta a ponta com Playwright |
 
 ### Como uma placa vira um projeto de PCB
@@ -167,12 +176,12 @@ Modificar, vender, redistribuir ou hospedar em outro endereço depende de autori
 
 ```bash
 npm run typecheck                 # TypeScript em modo estrito
-npm test                          # 1.237 testes unitários com Vitest
+npm test                          # 1.242 testes unitários com Vitest
 npx playwright install chromium
 npm run test:e2e                  # interface de ponta a ponta com Playwright
 ```
 
-Os testes unitários conferem o catálogo (pelo menos 132 placas, ids únicos e seguros para a rota, as sete categorias, cada uma com pelo menos dez placas, e a placa inicial), validam cada placa (textos nas duas línguas, toda parte com "o que é" e "para que serve", toda parte desenhada no 3D e todo componente dentro da placa), cada projeto de PCB (referências únicas no padrão do KiCad, bibliotecas, toda parte com footprint, pads, trilhas, vias e furos dentro da placa e trilhas só a 0°, 45° ou 90°), cada lab (placa, tema, partes e peças existentes, fiação, passos e código sem comentários), a bancada, o progresso salvo e as rotas. Os testes de interface giram a placa nos três eixos no visualizador 3D, separam as peças, acendem uma parte no 3D e no editor de PCB, ligam e desligam camadas, percorrem o catálogo com as 132 placas, abrem placas novas no 3D, voltam para a página inicial pelo logo, marcam peças e passos, usam o monitor serial, andam pela fiação e testam busca, idioma e tema. O CI roda a auditoria de dependências, o TypeScript, os testes, o build e o Playwright a cada push.
+Os testes unitários conferem o catálogo (pelo menos 132 placas, ids únicos e seguros para a rota, as sete categorias, cada uma com pelo menos dez placas, e a placa inicial), validam cada placa (textos nas duas línguas, toda parte com "o que é" e "para que serve", toda parte desenhada no 3D e todo componente dentro da placa), cada projeto de PCB (referências únicas no padrão do KiCad, bibliotecas, toda parte com footprint, pads, trilhas, vias e furos dentro da placa e trilhas só a 0°, 45° ou 90°), cada lab (placa, tema, partes e peças existentes, fiação, passos e código sem comentários), a bancada, o progresso salvo, as rotas e o navegador de placas (filtro sem acentos, vizinhas e seção atual). Os testes de interface giram a placa nos três eixos no visualizador 3D, separam as peças, acendem uma parte no 3D e no editor de PCB, ligam e desligam camadas, percorrem o catálogo com as 132 placas, abrem placas novas no 3D, voltam para a página inicial pelo logo, marcam peças e passos, usam o monitor serial, andam pela fiação, testam busca, idioma e tema e usam as laterais numa tela larga (filtro, troca de placa, índice da página e placas vizinhas). O CI roda a auditoria de dependências, o TypeScript, os testes, o build e o Playwright a cada push.
 
 ### Segurança
 
@@ -374,7 +383,7 @@ Os testes unitários conferem o catálogo (pelo menos 132 placas, ids únicos e 
 
 ```
 src/
-  app/                      estado, aparência, rotas e cálculo da bancada
+  app/                      estado, aparência, rotas, navegador de placas e cálculo da bancada
   css/                      estilo.css com tokens, janela KiCad, páginas, simuladores e responsivo
   dados/
     placas/                 as 132 placas por categoria e família, formas.ts e o catálogo

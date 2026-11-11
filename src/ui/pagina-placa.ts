@@ -1,4 +1,5 @@
 import { conjuntos, vigiar, type Contexto, type Pagina } from '../app/contexto';
+import { normalizar } from '../app/navegador';
 import { alternar, pecasUsadas, resumirBancada, situacao, type Situacao } from '../app/progresso';
 import { labsDaPlaca } from '../dados/laboratorios';
 import { pecaPorId } from '../dados/pecas';
@@ -61,7 +62,7 @@ const montarHeroi = (ctx: Contexto, placa: Placa, labs: readonly Laboratorio[]):
 
   return h(
     'section',
-    { class: 'heroi' },
+    { class: 'heroi', id: 'visao' },
     troca,
     h(
       'div',
@@ -93,10 +94,10 @@ const montarBancada = (ctx: Contexto, placa: Placa, labs: readonly Laboratorio[]
       h('span', { class: 'peca-check' }, icone('check', 'icone mini')),
       h('span', { class: 'peca-nome' }, nome, h('small', {}, u.labs === 1 ? ui('usadaEmUm') : ui('usadaEm', { n: u.labs }))),
     );
-    return { b, chave: nome.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase(), id: u.id };
+    return { b, chave: normalizar(nome), id: u.id };
   });
   busca.addEventListener('input', () => {
-    const termo = busca.value.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
+    const termo = normalizar(busca.value);
     for (const { b, chave } of botoesPecas) b.hidden = termo !== '' && !chave.includes(termo);
   });
   const lista = h('div', { class: 'pecas-lista' }, ...botoesPecas.map((x) => x.b));
@@ -116,7 +117,7 @@ const montarBancada = (ctx: Contexto, placa: Placa, labs: readonly Laboratorio[]
       r.umaPeca.length
         ? h('div', { class: 'ladrilhos' }, ...r.umaPeca.map(({ lab, peca }) => ladrilho(ctx, lab, 'uma', ui('falta', { p: tr(pecaPorId(peca)?.nome ?? peca) }))))
         : null,
-      r.mais ? h('p', { class: 'bancada-mais' }, ui('maisPecas', { n: r.mais })) : null,
+      r.mais ? h('p', { class: 'bancada-mais' }, r.mais === 1 ? ui('maisPecasUm') : ui('maisPecas', { n: r.mais })) : null,
     );
   };
   desenhar();

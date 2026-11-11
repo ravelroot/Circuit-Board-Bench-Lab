@@ -43,9 +43,19 @@ const renderizar = (placa: Placa): string | null => {
   return url;
 };
 
+const naTela = (img: HTMLImageElement): boolean => {
+  const r = img.getBoundingClientRect();
+  return r.bottom > -100 && r.top < window.innerHeight + 100;
+};
+
+const proximo = (): { placa: Placa; img: HTMLImageElement } | undefined => {
+  const i = fila.findIndex((item) => item.img.isConnected && naTela(item.img));
+  return i > 0 ? fila.splice(i, 1)[0] : fila.shift();
+};
+
 const processar = (): void => {
   if (trabalhando) return;
-  const item = fila.shift();
+  const item = proximo();
   if (!item) return;
   trabalhando = true;
   setTimeout(() => {

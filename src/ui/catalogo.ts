@@ -10,7 +10,7 @@ export const montarCatalogo = (ctx: Contexto): Pagina => {
     const placas = PLACAS.filter((p) => p.categoria === cat);
     return h(
       'section',
-      { class: 'catalogo-grupo', 'aria-labelledby': `cat-${cat}` },
+      { class: 'catalogo-grupo', id: `grupo-${cat}`, 'aria-labelledby': `cat-${cat}` },
       h('header', { class: 'catalogo-grupo-topo' }, h('h2', { class: 'titulo-secao', id: `cat-${cat}` }, nomeCategoria(cat)), h('span', { class: 'rotulo' }, String(placas.length))),
       h(
         'div',

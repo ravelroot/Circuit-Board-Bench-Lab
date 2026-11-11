@@ -2,6 +2,7 @@ import './css/estilo.css';
 import { aplicarAparencia, proximaPaleta } from './app/aparencia';
 import type { Contexto, Pagina } from './app/contexto';
 import { criarEstado, Loja, type Rota } from './app/estado';
+import { vizinhas } from './app/navegador';
 import { caminho, lerRota, mesmaRota } from './app/rotas';
 import { labPorId, labsDaPlaca } from './dados/laboratorios';
 import { pecaPorId } from './dados/pecas';
@@ -9,6 +10,7 @@ import { PLACA_INICIAL, placaPorId, PLACAS } from './dados/placas';
 import { definirIdioma, ui } from './i18n/textos';
 import { montarCabecalho } from './ui/cabecalho';
 import { montarCatalogo } from './ui/catalogo';
+import { montarLaterais } from './ui/laterais';
 import { montarBarraStatus } from './ui/barra-status';
 import { montarAjuda, montarBusca } from './ui/dialogos';
 import { h } from './ui/dom';
@@ -43,7 +45,9 @@ const aplicarTema = (): void => aplicarAparencia(loja.atual.tema, loja.atual.pal
 aplicarTema();
 
 const palco = h('main', { class: 'pagina', id: 'conteudo' });
-const app = h('div', { class: 'app' }, montarCabecalho(ctx), palco, montarBarraStatus(ctx), montarBusca(ctx), montarAjuda(ctx));
+const laterais = montarLaterais(ctx);
+const moldura = h('div', { class: 'moldura' }, laterais.esquerda, palco, laterais.direita);
+const app = h('div', { class: 'app' }, montarCabecalho(ctx), moldura, montarBarraStatus(ctx), montarBusca(ctx), montarAjuda(ctx));
 let atual: Pagina | null = null;
 
 const titulo = (): string => {
@@ -62,6 +66,7 @@ const desenhar = (rolar: boolean): void => {
   else if (rota.pagina === 'placa' && rota.placa) atual = montarPaginaPlaca(ctx, rota.placa);
   else atual = montarCatalogo(ctx);
   palco.replaceChildren(atual.el);
+  laterais.atualizar();
   document.title = titulo();
   if (rolar) window.scrollTo({ top: 0 });
 };
@@ -83,8 +88,8 @@ window.addEventListener('hashchange', () => {
 });
 
 const vizinhoPlaca = (direcao: 1 | -1): void => {
-  const i = PLACAS.findIndex((p) => p.id === loja.atual.rota.placa);
-  const alvo = PLACAS[(i + direcao + PLACAS.length) % PLACAS.length];
+  const { anterior, proxima } = vizinhas(PLACAS, loja.atual.rota.placa);
+  const alvo = (direcao === 1 ? proxima : anterior) ?? PLACAS[0];
   if (alvo) navegar({ pagina: 'placa', placa: alvo.id, lab: null });
 };
 

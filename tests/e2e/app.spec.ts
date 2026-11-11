@@ -158,3 +158,34 @@ test('as novas placas abrem com vista 3D e editor de PCB', async ({ page }) => {
     await expect(page.locator('.visor3d-status')).toContainText(`${id}.kicad_pcb`);
   }
 });
+
+test('em telas largas, as laterais navegam pelas placas e pela página', async ({ page }) => {
+  await page.setViewportSize({ width: 1920, height: 1080 });
+  await page.goto('./#/esp32-s3');
+  const esquerda = page.locator('.trilho-placas');
+  const direita = page.locator('.trilho-contexto');
+  await expect(esquerda).toBeVisible();
+  await expect(direita).toBeVisible();
+  await expect(page.locator('.troca-placa')).toBeHidden();
+  await expect(esquerda.locator('.trilho-placa[aria-current="page"]')).toHaveAttribute('data-placa', 'esp32-s3');
+  await expect(direita.locator('.trilho-indice-item')).toHaveCount(4);
+  await expect(direita.locator('.trilho-indice-item[aria-current="location"]')).toHaveText(/Visão geral/);
+  await direita.locator('.trilho-indice-item', { hasText: 'Laboratórios' }).click();
+  await expect(direita.locator('.trilho-indice-item[aria-current="location"]')).toHaveText(/Laboratórios/);
+  await esquerda.locator('.trilho-busca').fill('jetson');
+  await expect(esquerda.locator('.trilho-placa')).toHaveCount(1);
+  await esquerda.locator('.trilho-placa').click();
+  await expect(page).toHaveURL(/#\/jetson-nano$/);
+  await expect(page.locator('.heroi-titulo')).toContainText('JETSON');
+  await expect(direita).toContainText('Partes para conhecer');
+  await direita.locator('.trilho-vizinho.proxima').click();
+  await expect(page).toHaveURL(/#\/orange-pi-5$/);
+  await esquerda.locator('.trilho-busca').fill('');
+  await esquerda.locator('.trilho-todas').click();
+  await expect(page).toHaveURL(/#\/placas$/);
+  await expect(direita.locator('.trilho-indice-item')).toHaveCount(7);
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await expect(esquerda).toBeHidden();
+  await expect(direita).toBeHidden();
+});
+
