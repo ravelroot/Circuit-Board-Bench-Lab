@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/images/logo.png" width="160" alt="Rumo">
+  <img src="docs/images/logo.png" width="200" alt="Rumo">
 </p>
 
 <h1 align="center">Rumo<br><sub><sup><sup><sub>Copyright (©) 2026 Erik Pimenta</sub></sup></sup></sub></h1>
