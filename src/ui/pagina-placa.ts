@@ -9,7 +9,7 @@ import { tr, ui } from '../i18n/textos';
 import { estilo, h, s, trocar, zoomDaPagina } from './dom';
 import { icone } from './icones';
 import { montarJanela } from './kicad/janela';
-import { montarVitrine } from './vitrine';
+import { obterVitrine } from './vitrine';
 
 const dois = (n: number): string => String(n).padStart(2, '0');
 
@@ -284,11 +284,11 @@ export const montarPaginaPlaca = (ctx: Contexto, id: string): Pagina => {
   const placa = placaPorId(id);
   if (!placa) return { el: h('p', {}, ui('naoEncontrada')), destruir: () => undefined };
   const labs = labsDaPlaca(placa.id);
-  const vitrine = montarVitrine(ctx, placa);
+  const vitrine = obterVitrine(ctx, placa);
   const conheca = montarConheca(placa, labs);
   const el = h(
     'div',
-    { class: 'pagina-placa', 'data-placa': placa.id },
+    { class: `pagina-placa${vitrine.adotada ? ' continua' : ''}`, 'data-placa': placa.id },
     vitrine.el,
     montarHeroi(placa, labs),
     labs.length ? montarBancada(ctx, placa, labs) : null,
@@ -299,7 +299,7 @@ export const montarPaginaPlaca = (ctx: Contexto, id: string): Pagina => {
   return {
     el,
     destruir: () => {
-      vitrine.destruir();
+      vitrine.soltar();
       conheca.destruir();
     },
   };

@@ -33,11 +33,11 @@ export class Fabrica {
     const std = (cor: string, metalness: number, roughness: number): THREE.MeshStandardMaterial => this.guardar(new THREE.MeshStandardMaterial({ color: cor, metalness, roughness }));
     const metalAcabamento = corAcabamento(projeto);
     this.m = {
-      epoxi: std('#141416', 0, 0.55),
+      epoxi: std('#17171a', 0, 0.42),
       plastico: std('#1a1a1c', 0, 0.62),
-      metal: std('#d4d7db', 1, 0.3),
+      metal: std('#dfe2e6', 1, 0.24),
       aluminio: std('#b7bcc2', 0.85, 0.42),
-      ouro: std('#e0bb5e', 1, 0.26),
+      ouro: std('#e6c068', 1, 0.22),
       estanho: std(metalAcabamento === '#d8b55c' ? '#d6d8db' : '#cfd2d6', 1, 0.34),
       ceramica: std('#b9956a', 0, 0.62),
       branco: std('#f1f1ef', 0, 0.42),
@@ -138,6 +138,119 @@ const em = (obj: THREE.Object3D, x: number, y: number, z: number): THREE.Object3
   return obj;
 };
 
+const conectorMetalico = (fab: Fabrica, D: number, W: number, H: number, rotulo: string | undefined, cor: string | undefined): THREE.Group => {
+  const g = new THREE.Group();
+  const nome = (rotulo ?? '').toUpperCase();
+  const casca = fab.cor('#e3e6ea', 1, 0.22);
+  const escovado = fab.cor('#cdd1d6', 1, 0.34);
+  const fundo = fab.m.escuro;
+  const pequeno = H <= 4.2 || /C$|USB-C|HDMI|MICRO|µ/.test(nome);
+  const rj45 = nome.includes('RJ45') || nome.includes('ETH');
+  const usbA = !pequeno && nome.includes('USB');
+  const face = D / 2;
+  const raio = pequeno ? Math.min(H, W) * 0.45 : Math.min(0.6, H * 0.08);
+  const corpo = fab.arredondada(D, W, H, raio, casca);
+  corpo.position.set(0, 0, H / 2);
+  g.add(corpo);
+  const boca = (largura: number, altura: number, zc: number, profundidade = Math.min(D * 0.7, 6)): void => {
+    const r = pequeno ? Math.min(largura, altura) * 0.45 : Math.min(0.35, altura * 0.12);
+    const furo = fab.arredondada(profundidade, largura, altura, r, fundo);
+    furo.position.set(face - profundidade / 2 + 0.04, 0, zc);
+    g.add(furo);
+    const moldura = fab.arredondada(0.18, largura + 0.5, altura + 0.5, r + 0.2, escovado);
+    moldura.position.set(face + 0.02, 0, zc);
+    g.add(moldura);
+  };
+  if (usbA) {
+    const portas = H > W * 0.8 ? 2 : 1;
+    const insercao = cor ? fab.cor(cor, 0, 0.42) : fab.cor('#18181b', 0, 0.5);
+    for (let i = 0; i < portas; i++) {
+      const zc = portas === 2 ? H * (i === 0 ? 0.27 : 0.73) : H / 2;
+      const alturaBoca = Math.min(H / portas - 1.6, 5.4);
+      boca(W * 0.86, alturaBoca, zc);
+      const lingua = fab.caixa(Math.min(D * 0.62, 5.2), W * 0.64, alturaBoca * 0.3, insercao);
+      lingua.position.set(face - Math.min(D * 0.62, 5.2) / 2 - 0.25, 0, zc + alturaBoca * 0.16);
+      g.add(lingua);
+      for (const s of [-1, 1]) {
+        const mola = fab.caixa(0.6, 1.2, 0.12, escovado);
+        mola.position.set(face - 0.5, s * W * 0.22, zc + alturaBoca / 2 + 0.02);
+        g.add(mola);
+      }
+    }
+    const nervura = fab.caixa(D * 0.7, W * 0.5, 0.12, escovado);
+    nervura.position.set(-D * 0.05, 0, H + 0.02);
+    g.add(nervura);
+  } else if (rj45) {
+    const alturaBoca = H * 0.58;
+    boca(W * 0.72, alturaBoca, H * 0.42, Math.min(D * 0.8, 12));
+    const trava = fab.caixa(0.3, W * 0.28, alturaBoca * 0.22, fundo);
+    trava.position.set(face + 0.06, 0, H * 0.42 - alturaBoca * 0.5);
+    g.add(trava);
+    const ledVerde = fab.guardar(new THREE.MeshStandardMaterial({ color: '#36d66a', emissive: '#36d66a', emissiveIntensity: 0.8, roughness: 0.3 }));
+    const ledAmbar = fab.guardar(new THREE.MeshStandardMaterial({ color: '#ffb020', emissive: '#ffb020', emissiveIntensity: 0.6, roughness: 0.3 }));
+    for (const [s, mat] of [[-1, ledVerde], [1, ledAmbar]] as const) {
+      const led = fab.caixa(0.2, W * 0.12, H * 0.1, mat);
+      led.position.set(face + 0.08, s * W * 0.36, H * 0.86);
+      g.add(led);
+    }
+    for (let i = 0; i < 3; i++) {
+      const ranhura = fab.caixa(D * 0.5, 0.35, 0.1, escovado);
+      ranhura.position.set(-D * 0.1, (i - 1) * W * 0.22, H + 0.02);
+      g.add(ranhura);
+    }
+  } else {
+    const alturaBoca = pequeno ? H * 0.62 : H * 0.55;
+    boca(W * (pequeno ? 0.82 : 0.78), alturaBoca, H / 2, Math.min(D * 0.6, 5));
+    const lingua = fab.caixa(Math.min(D * 0.5, 3.5), W * 0.56, alturaBoca * 0.22, fab.cor(cor ?? '#1c1c1f', 0, 0.5));
+    lingua.position.set(face - Math.min(D * 0.5, 3.5) / 2 - 0.2, 0, H / 2);
+    g.add(lingua);
+  }
+  for (const s of [-1, 1]) {
+    const aba = fab.caixa(Math.min(1.6, D * 0.2), 0.3, Math.min(1.2, H * 0.4), escovado);
+    aba.position.set(-D * 0.2, s * (W / 2 + 0.12), Math.min(1.2, H * 0.4) / 2);
+    g.add(aba);
+  }
+  return g;
+};
+
+const conectorPlastico = (fab: Fabrica, D: number, W: number, H: number, cor: string, rotulo: string | undefined): THREE.Group => {
+  const g = new THREE.Group();
+  const plastico = fab.cor(cor, 0, 0.55);
+  const corpo = fab.arredondada(D, W, H, Math.min(0.5, H * 0.1), plastico);
+  corpo.position.set(0, 0, H / 2);
+  g.add(corpo);
+  const face = D / 2;
+  if (H <= 3.5 && W >= D * 1.8) {
+    const trava = fab.arredondada(D * 0.42, W * 0.96, Math.max(0.4, H * 0.36), 0.15, fab.cor('#5a4a3a', 0, 0.5));
+    trava.position.set(face - D * 0.2, 0, H + Math.max(0.4, H * 0.36) / 2);
+    g.add(trava);
+    const fenda = fab.caixa(0.3, W * 0.86, H * 0.3, fab.m.escuro);
+    fenda.position.set(face + 0.01, 0, H * 0.55);
+    g.add(fenda);
+  } else if (H >= 5 && Math.max(W, H) <= 14) {
+    const r = Math.min(W, H) * 0.32;
+    const comprimento = Math.min(2.2, D * 0.3);
+    const cano = fab.cilindro(r, comprimento, plastico, 32);
+    cano.rotation.y = Math.PI / 2;
+    cano.position.set(face + comprimento / 2, 0, H / 2);
+    g.add(cano);
+    const furo = fab.cilindro(r * 0.55, 0.2, fab.m.escuro, 24);
+    furo.rotation.y = Math.PI / 2;
+    furo.position.set(face + comprimento + 0.05, 0, H / 2);
+    g.add(furo);
+  } else {
+    const fenda = fab.arredondada(0.4, W * 0.8, H * 0.5, 0.15, fab.m.escuro);
+    fenda.position.set(face + 0.05, 0, H * 0.5);
+    g.add(fenda);
+  }
+  if (rotulo) {
+    const r = fab.rotulo(rotulo, '#d8d8d8', Math.min(D * 0.8, 10), Math.min(W * 0.5, 4));
+    r.position.set(0, 0, H + 0.02);
+    g.add(r);
+  }
+  return g;
+};
+
 const direcaoSaida = (f: Footprint, p: ProjetoPcb): [number, number] => {
   const c = f.corpo;
   const distancias: [number, [number, number]][] = [
@@ -221,15 +334,12 @@ export const construirModelo = (f: Footprint, p: ProjetoPcb, fab: Fabrica): THRE
     }
     case 'conector': {
       const plastico = c.cor !== undefined && luminancia(c.cor) < 0.3;
-      const material = plastico ? fab.cor(c.cor ?? '#1a1a1a', 0, 0.6) : c.cor ? fab.cor(c.cor, 0.6, 0.35) : m.metal;
-      const corpo = fab.caixa(l, a, z, material);
-      adicionar(corpo, cx, cy, z / 2);
       const [dx, dy] = direcaoSaida(f, p);
-      const boca = fab.caixa(dx ? 0.05 : l * 0.78, dy ? 0.05 : a * 0.78, z * 0.62, m.escuro);
-      adicionar(boca, cx + (dx * l) / 2 + dx * 0.02, cy + (dy * a) / 2 + dy * 0.02, z / 2);
-      const lingua = fab.caixa(dx ? Math.min(l * 0.6, 4) : l * 0.5, dy ? Math.min(a * 0.6, 4) : a * 0.5, z * 0.12, plastico ? m.ouro : m.plastico);
-      adicionar(lingua, cx + (dx * l) / 2 - dx * Math.min(l * 0.3, 2), cy + (dy * a) / 2 - dy * Math.min(a * 0.3, 2), z / 2);
-      if (c.rotulo && !plastico) rotuloTopo(c.rotulo, '#5a5d61', z, 0.6);
+      const profundidade = dx ? l : a;
+      const largura = dx ? a : l;
+      const detalhe = plastico ? conectorPlastico(fab, profundidade, largura, z, c.cor ?? '#1a1a1c', c.rotulo) : conectorMetalico(fab, profundidade, largura, z, c.rotulo, c.cor);
+      detalhe.rotation.z = Math.atan2(dy, dx);
+      adicionar(detalhe, cx, cy, 0);
       break;
     }
     case 'botao': {

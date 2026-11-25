@@ -46,13 +46,19 @@ const limitar = (v: number, min: number, max: number): number => Math.min(max, M
 const normalizar = (v: number): number => Math.round((((v + 180) % 360 + 360) % 360 - 180) * 10) / 10;
 const suavizar = (t: number): number => 1 - Math.pow(1 - t, 3);
 
+let webglTestado: boolean | null = null;
+
 export const webglDisponivel = (): boolean => {
+  if (webglTestado !== null) return webglTestado;
   try {
     const c = document.createElement('canvas');
-    return !!(c.getContext('webgl2') ?? c.getContext('webgl'));
+    const g = c.getContext('webgl2') ?? c.getContext('webgl');
+    webglTestado = !!g;
+    g?.getExtension('WEBGL_lose_context')?.loseContext();
   } catch {
-    return false;
+    webglTestado = false;
   }
+  return webglTestado;
 };
 
 export const montarVisor3d = (placa: Placa, opcoes: OpcoesVisor3d): Visor3d | null => {
@@ -64,7 +70,7 @@ export const montarVisor3d = (placa: Placa, opcoes: OpcoesVisor3d): Visor3d | nu
   }
   renderer.setPixelRatio(Math.max(1, Math.min((window.devicePixelRatio || 1) * zoomDaPagina(), 2)));
   renderer.shadowMap.enabled = true;
-  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.shadowMap.type = THREE.PCFShadowMap;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.05;
   renderer.outputColorSpace = THREE.SRGBColorSpace;

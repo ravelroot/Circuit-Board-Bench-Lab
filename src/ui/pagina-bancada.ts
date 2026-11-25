@@ -34,7 +34,8 @@ import { miniatura } from './kicad/miniaturas';
 import { alternarLofi, lofiTocando, aoMudarLofi } from './lofi';
 import { COR_FIO, fio3d, tapete, type Fio3d } from './cena3d/objetos';
 import { construirModulo, type Modulo3d } from './cena3d/modulos';
-import { montarPalco } from './cena3d/palco';
+import { miniaturaModulo } from './cena3d/miniatura-modulo';
+import { amortecer, easeOut, montarPalco } from './cena3d/palco';
 
 const CHAVE = 'rumo:bancada3d';
 const MAX_SERIAL = 300;
@@ -88,6 +89,9 @@ const novoId = (prefixo: string): string => `${prefixo}${Date.now().toString(36)
 
 interface Item3d {
   readonly grupo: THREE.Group;
+  readonly alvo: { x: number; y: number; rot: number };
+  entrada: number;
+  elevar: number;
   readonly pinos: ReadonlyMap<string, THREE.Vector3>;
   readonly alvos: readonly THREE.Mesh[];
   readonly modulo?: Modulo3d;
@@ -115,6 +119,7 @@ export const montarPaginaBancada = (ctx: Contexto, idMissao: string | null): Pag
   let ultimaSaida: Saidas | null = null;
   const entradas: Entradas = { botao: false, pot: 512, luz: 700, distancia: 23, temperatura: 24, umidade: 55 };
   let audio: { ctx: AudioContext; osc: OscillatorNode; ganho: GainNode } | null = null;
+  let carregado = false;
 
   const gravar = (): void => {
     try {
@@ -138,7 +143,7 @@ export const montarPaginaBancada = (ctx: Contexto, idMissao: string | null): Pag
   const palco = montarPalco({
     classe: 'bancada3d-palco',
     rotulo: ui('bancadaVirtual'),
-    pose: { inclinacao: 48, giro: -14, distancia: 430 },
+    pose: { inclinacao: 50, giro: -14, distancia: 360 },
     distancias: [120, 1500],
     extensao: 360,
     rodaLivre: true,
@@ -181,7 +186,7 @@ export const montarPaginaBancada = (ctx: Contexto, idMissao: string | null): Pag
     ];
     for (const [grupo, chave] of GRUPOS) {
       blocos.push(h('h3', { class: 'rotulo' }, ui(chave)));
-      for (const m of MODULOS.filter((x) => x.grupo === grupo)) blocos.push(adicionarBotao('modulo', m.tipo, icone(ICONE_MODULO[m.tipo]), tr(m.nome), tr(m.resumo)));
+      for (const m of MODULOS.filter((x) => x.grupo === grupo)) blocos.push(adicionarBotao('modulo', m.tipo, miniaturaModulo(m, icone(ICONE_MODULO[m.tipo])), tr(m.nome), tr(m.resumo)));
     }
     return h('aside', { class: 'bancada3d-pecas', 'aria-label': ui('pecasDisponiveis') }, ...blocos);
   };
@@ -191,18 +196,25 @@ export const montarPaginaBancada = (ctx: Contexto, idMissao: string | null): Pag
     return { el, destruir: () => undefined };
   }
 
-  palco.cena.add(tapete({ largura: LIMITE_X * 2 + 40, altura: LIMITE_Y * 2 + 40, cor: '#5f7182', linha: '#6c7e90', forte: '#8193a5', reguas: true }, palco.renderer));
+  palco.cena.add(tapete({ largura: LIMITE_X * 2 + 40, altura: LIMITE_Y * 2 + 40, cor: '#5a6b7c', linha: '#6d7e8f', forte: '#8597a8', reguas: true }, palco.renderer));
   const itens3d = new Map<string, Item3d>();
   const fios3d = new Map<string, Fio3d>();
   const raiz = new THREE.Group();
   palco.cena.add(raiz);
-  const marcaPendente = new THREE.Mesh(new THREE.SphereGeometry(1.6, 16, 12), new THREE.MeshBasicMaterial({ color: '#ff9f1c' }));
-  const marcaPairar = new THREE.Mesh(new THREE.SphereGeometry(1.4, 16, 12), new THREE.MeshBasicMaterial({ color: '#ffe066' }));
-  marcaPendente.visible = false;
-  marcaPairar.visible = false;
-  const previa = new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(), new THREE.Vector3()]), new THREE.LineDashedMaterial({ color: '#ff9f1c', dashSize: 3, gapSize: 2 }));
-  previa.visible = false;
-  palco.cena.add(marcaPendente, marcaPairar, previa);
+  const anel = (cor: string): THREE.Mesh => {
+    const m = new THREE.Mesh(new THREE.TorusGeometry(1.9, 0.32, 10, 36), new THREE.MeshBasicMaterial({ color: cor, transparent: true, opacity: 0.95, depthTest: false }));
+    m.renderOrder = 9;
+    m.visible = false;
+    return m;
+  };
+  const marcaPendente = anel('#ff6a3d');
+  const marcaPairar = anel('#ffffff');
+  const previa = fio3d('#f2c230');
+  previa.material.transparent = true;
+  previa.material.opacity = 0.8;
+  previa.grupo.visible = false;
+  let previaDestino: THREE.Vector3 | null = null;
+  palco.cena.add(marcaPendente, marcaPairar, previa.grupo);
 
   const capsDe = (ponta: Ponta): ReadonlySet<Capacidade> => {
     const item = bancada.itens.find((i) => i.id === ponta.item);
@@ -223,11 +235,22 @@ export const montarPaginaBancada = (ctx: Contexto, idMissao: string | null): Pag
     return i3.grupo.localToWorld(local.clone());
   };
 
-  const posicionar = (item: ItemBancada): void => {
+  const posicionar = (item: ItemBancada, imediato = false): void => {
     const i3 = itens3d.get(item.id);
     if (!i3) return;
-    i3.grupo.position.set(item.x, item.y, 0);
-    i3.grupo.rotation.z = (item.rot * Math.PI) / 2;
+    const rot = (item.rot * Math.PI) / 2;
+    let alvoRot = rot;
+    const atualRot = i3.grupo.rotation.z;
+    while (alvoRot - atualRot > Math.PI) alvoRot -= Math.PI * 2;
+    while (alvoRot - atualRot < -Math.PI) alvoRot += Math.PI * 2;
+    i3.alvo.x = item.x;
+    i3.alvo.y = item.y;
+    i3.alvo.rot = alvoRot;
+    if (imediato) {
+      i3.grupo.position.set(item.x, item.y, 0);
+      i3.grupo.rotation.z = alvoRot;
+    }
+    palco.pedir();
   };
 
   const construirItem = (item: ItemBancada): void => {
@@ -241,7 +264,7 @@ export const montarPaginaBancada = (ctx: Contexto, idMissao: string | null): Pag
       const placa = placaPorId(item.ref);
       const pb = placaBancada(item.ref);
       if (!placa || !pb) return;
-      cena = construirCena(placa, palco.renderer, 1024, true);
+      cena = construirCena(placa, palco.renderer, 2048, true);
       const g = cena.grupo;
       cena.cena.remove(g);
       const { largura, altura, espessura } = cena.projeto;
@@ -276,8 +299,8 @@ export const montarPaginaBancada = (ctx: Contexto, idMissao: string | null): Pag
       alvos.push(alvo);
     }
     raiz.add(grupo);
-    itens3d.set(item.id, { grupo, pinos, alvos, ...(modulo ? { modulo } : {}), ...(cena ? { cena } : {}), ...(led ? { led } : {}) });
-    posicionar(item);
+    itens3d.set(item.id, { grupo, alvo: { x: item.x, y: item.y, rot: 0 }, entrada: carregado ? performance.now() : 0, elevar: 0, pinos, alvos, ...(modulo ? { modulo } : {}), ...(cena ? { cena } : {}), ...(led ? { led } : {}) });
+    posicionar(item, true);
   };
 
   const removerItem3d = (id: string): void => {
@@ -294,7 +317,8 @@ export const montarPaginaBancada = (ctx: Contexto, idMissao: string | null): Pag
     itens3d.delete(id);
   };
 
-  const desenharFios = (): void => {
+  const nascimento = new Map<string, number>();
+  const desenharFios = (so?: ReadonlySet<string>): void => {
     for (const [id, f] of fios3d) {
       if (!bancada.fios.some((x) => x.id === id)) {
         raiz.remove(f.grupo);
@@ -303,6 +327,7 @@ export const montarPaginaBancada = (ctx: Contexto, idMissao: string | null): Pag
       }
     }
     for (const fio of bancada.fios) {
+      if (so && !so.has(fio.a.item) && !so.has(fio.b.item) && fios3d.has(fio.id)) continue;
       const a = mundoDoPino(fio.a);
       const b = mundoDoPino(fio.b);
       if (!a || !b) continue;
@@ -312,8 +337,11 @@ export const montarPaginaBancada = (ctx: Contexto, idMissao: string | null): Pag
         f.grupo.userData.fio = fio.id;
         fios3d.set(fio.id, f);
         raiz.add(f.grupo);
+        if (carregado) nascimento.set(fio.id, performance.now());
       }
       f.atualizar(a, b);
+      const t0 = nascimento.get(fio.id);
+      if (t0 !== undefined) f.crescer(easeOut(Math.min(1, (performance.now() - t0) / 420)));
       f.material.emissive = new THREE.Color(selecionado?.tipo === 'fio' && selecionado.id === fio.id ? '#ffb703' : '#000000');
       f.material.emissiveIntensity = 0.6;
     }
@@ -535,13 +563,92 @@ export const montarPaginaBancada = (ctx: Contexto, idMissao: string | null): Pag
     desenharPainel();
   }
 
-  palco.animar(() => {
-    if (!rodando || !ultimaSaida) return false;
-    for (const item of bancada.itens) {
-      const i3 = itens3d.get(item.id);
-      if (item.tipo === 'modulo' && (item.ref === 'buzzer' || item.ref === 'motor')) i3?.modulo?.aplicar(ultimaSaida, entradas);
+  const previaAtual = new THREE.Vector3();
+  const selecaoFlutua = h('div', { class: 'bancada3d-selecao-flutua', hidden: true });
+  palco.animar((dt, agora) => {
+    let mais = false;
+    const movidos = new Set<string>();
+    for (const [id, i3] of itens3d) {
+      const k = amortecer(dt, arrasto?.id === id ? 40 : 70);
+      const elevarAlvo = arrasto?.id === id && arrasto.moveu ? 7 : 0;
+      i3.elevar += (elevarAlvo - i3.elevar) * amortecer(dt, 70);
+      const dx = i3.alvo.x - i3.grupo.position.x;
+      const dy = i3.alvo.y - i3.grupo.position.y;
+      const dr = i3.alvo.rot - i3.grupo.rotation.z;
+      let z = i3.elevar;
+      let escala = 1;
+      if (i3.entrada) {
+        const t = Math.min(1, (agora - i3.entrada) / 620);
+        const e = easeOut(t);
+        z += (1 - e) * 70;
+        escala = 0.9 + 0.1 * e + Math.sin(t * Math.PI) * 0.03;
+        if (t >= 1) i3.entrada = 0;
+        mais = true;
+      }
+      if (Math.abs(dx) > 0.01 || Math.abs(dy) > 0.01 || Math.abs(dr) > 0.001 || Math.abs(i3.grupo.position.z - z) > 0.01 || i3.grupo.scale.x !== escala) {
+        i3.grupo.position.x += dx * k;
+        i3.grupo.position.y += dy * k;
+        i3.grupo.rotation.z += dr * amortecer(dt, 90);
+        i3.grupo.position.z = z;
+        i3.grupo.scale.setScalar(escala);
+        movidos.add(id);
+        mais = true;
+      }
     }
-    return true;
+    if (movidos.size) {
+      desenharFios(movidos);
+      if (pendente && movidos.has(pendente.item)) {
+        const w = mundoDoPino(pendente);
+        if (w) marcaPendente.position.copy(w).setZ(w.z + 1);
+      }
+    }
+    for (const [id, t0] of nascimento) {
+      const f = fios3d.get(id);
+      const t = Math.min(1, (agora - t0) / 420);
+      f?.crescer(easeOut(t));
+      if (t >= 1) nascimento.delete(id);
+      mais = true;
+    }
+    if (marcaPendente.visible) {
+      marcaPendente.scale.setScalar(1 + Math.sin(agora / 160) * 0.18);
+      mais = true;
+    }
+    if (pendente && previa.grupo.visible && previaDestino) {
+      const a = mundoDoPino(pendente);
+      if (a) {
+        if (previaAtual.lengthSq() === 0) previaAtual.copy(a);
+        previaAtual.lerp(previaDestino, amortecer(dt, 45));
+        previa.atualizar(a, previaAtual);
+        mais = true;
+      }
+    } else previaAtual.set(0, 0, 0);
+    if (rodando && palco.ocioso(1800)) {
+      palco.pose.giro += dt * 0.006;
+      mais = true;
+    }
+    if (rodando && ultimaSaida) {
+      for (const item of bancada.itens) {
+        const i3 = itens3d.get(item.id);
+        if (item.tipo === 'modulo' && (item.ref === 'buzzer' || item.ref === 'motor')) i3?.modulo?.aplicar(ultimaSaida, entradas);
+      }
+      mais = true;
+    }
+    return mais;
+  });
+
+  palco.aoDesenhar(() => {
+    const sel = selecionado?.tipo === 'item' ? selecionado.id : null;
+    const i3 = sel ? itens3d.get(sel) : undefined;
+    if (!sel || !i3 || arrasto?.moveu) {
+      selecaoFlutua.hidden = true;
+      return;
+    }
+    const caixa = new THREE.Box3().setFromObject(i3.grupo);
+    const topo = new THREE.Vector3((caixa.min.x + caixa.max.x) / 2, caixa.max.y, caixa.max.z + 4);
+    const p = palco.projetar(topo);
+    const z = zoomDaPagina();
+    selecaoFlutua.hidden = !p.frente;
+    estilo(selecaoFlutua, { transform: `translate(${(p.x / z).toFixed(1)}px, ${(p.y / z).toFixed(1)}px) translate(-50%, -130%)` });
   });
 
   const raycastPino = (ev: PointerEvent): Ponta | null => {
@@ -570,7 +677,7 @@ export const montarPaginaBancada = (ctx: Contexto, idMissao: string | null): Pag
     return o ? String(o.userData.fio) : null;
   };
 
-  let arrasto: { id: string; dx: number; dy: number } | null = null;
+  let arrasto: { id: string; dx: number; dy: number; moveu: boolean } | null = null;
   let segurandoBotao = false;
 
   function pegar(ev: PointerEvent): boolean {
@@ -589,7 +696,7 @@ export const montarPaginaBancada = (ctx: Contexto, idMissao: string | null): Pag
     }
     const ponto = palco.noPlano(ev, 0);
     if (!ponto) return false;
-    arrasto = { id: item.id, dx: item.x - ponto.x, dy: item.y - ponto.y };
+    arrasto = { id: item.id, dx: item.x - ponto.x, dy: item.y - ponto.y, moveu: false };
     return true;
   }
 
@@ -600,10 +707,11 @@ export const montarPaginaBancada = (ctx: Contexto, idMissao: string | null): Pag
     const x = Math.max(-LIMITE_X, Math.min(LIMITE_X, ponto.x + arrasto.dx));
     const y = Math.max(-LIMITE_Y, Math.min(LIMITE_Y, ponto.y + arrasto.dy));
     const id = arrasto.id;
+    arrasto.moveu = true;
+    palco.tela.style.cursor = 'grabbing';
     bancada = { ...bancada, itens: bancada.itens.map((i) => (i.id === id ? { ...i, x, y } : i)) };
     const item = bancada.itens.find((i) => i.id === id);
     if (item) posicionar(item);
-    desenharFios();
     desenharBandeiras();
   }
 
@@ -649,7 +757,8 @@ export const montarPaginaBancada = (ctx: Contexto, idMissao: string | null): Pag
   const cancelarPendente = (): void => {
     pendente = null;
     marcaPendente.visible = false;
-    previa.visible = false;
+    previa.grupo.visible = false;
+    previaDestino = null;
     aviso.hidden = true;
     palco.pedir();
   };
@@ -712,12 +821,11 @@ export const montarPaginaBancada = (ctx: Contexto, idMissao: string | null): Pag
       palco.tela.style.cursor = 'crosshair';
     }
     if (pendente && ev) {
-      const a = mundoDoPino(pendente);
-      const b = ponta ? mundoDoPino(ponta) : palco.noPlano(ev, 8);
-      if (a && b) {
-        previa.geometry.setFromPoints([a.clone().setZ(a.z + 1), b.clone().setZ(b.z + 1)]);
-        previa.computeLineDistances();
-        previa.visible = true;
+      const b = ponta ? mundoDoPino(ponta) : palco.noPlano(ev, 2);
+      if (b) {
+        if (!previaDestino) previaDestino = b.clone();
+        previaDestino.copy(b);
+        previa.grupo.visible = true;
       }
     }
     palco.pedir();
@@ -854,6 +962,15 @@ export const montarPaginaBancada = (ctx: Contexto, idMissao: string | null): Pag
       return;
     }
     const sel = selecionado ? (selecionado.tipo === 'fio' ? bancada.fios.find((f) => f.id === selecionado?.id) : bancada.itens.find((i) => i.id === selecionado?.id)) : undefined;
+    if (sel && !('a' in sel)) {
+      trocar(
+        selecaoFlutua,
+        h('strong', {}, nomeItem(sel as ItemBancada)),
+        h('button', { type: 'button', onclick: girarSelecionado }, icone('girar', 'icone mini'), ' ', ui('girar90')),
+        h('button', { type: 'button', onclick: removerSelecionado }, icone('fechar', 'icone mini'), ' ', ui('remover')),
+      );
+    }
+    palco?.pedir();
     const cartaoSel = sel
       ? h(
           'div',
@@ -952,10 +1069,11 @@ export const montarPaginaBancada = (ctx: Contexto, idMissao: string | null): Pag
     bancada = { itens: [{ id: novoId('p'), tipo: 'placa', ref: 'uno-r3', x: 0, y: 40, rot: 0 }], fios: [] };
   }
   sincronizar();
+  carregado = true;
   preencherMissoes();
   desenharPainel();
 
-  palco.el.append(aviso, dica, bandeiras);
+  palco.el.append(aviso, dica, bandeiras, selecaoFlutua);
   container.append(barra, h('div', { class: 'bancada3d-corpo' }, montarPecas(), palco.el, painel));
   const el = h(
     'div',

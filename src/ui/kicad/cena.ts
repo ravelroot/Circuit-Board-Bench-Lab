@@ -24,7 +24,7 @@ export interface Cena {
   readonly descartar: () => void;
 }
 
-export const pxmmPara = (p: ProjetoPcb, maximo: number): number => Math.min(28, maximo / Math.max(p.largura, p.altura));
+export const pxmmPara = (p: ProjetoPcb, maximo: number): number => Math.min(40, maximo / Math.max(p.largura, p.altura));
 
 const ambientes = new WeakMap<THREE.WebGLRenderer, THREE.Texture>();
 
@@ -87,7 +87,7 @@ export const construirCena = (placa: Placa, renderer: THREE.WebGLRenderer, textu
     return t;
   };
   const pbr = texturaDe(desenharPbr(projeto, pxmm), false);
-  const topo = fab.guardar(new THREE.MeshStandardMaterial({ map: texturaDe(desenharFace(projeto, { mascara: true, serigrafia: true, pxmm }), true), metalnessMap: pbr, roughnessMap: pbr, metalness: 1, roughness: 1 }));
+  const topo = fab.guardar(new THREE.MeshPhysicalMaterial({ map: texturaDe(desenharFace(projeto, { mascara: true, serigrafia: true, pxmm }), true), metalnessMap: pbr, roughnessMap: pbr, metalness: 1, roughness: 1, clearcoat: 0.3, clearcoatRoughness: 0.18 }));
   const verso = fab.guardar(new THREE.MeshStandardMaterial({ map: texturaDe(desenharFace(projeto, { mascara: true, serigrafia: false, pxmm: pxmm * 0.6 }, true), true), roughness: 0.5 }));
   const lado = fab.cor('#b4a46e', 0, 0.8);
   const geometria = fab.guardar(new THREE.BoxGeometry(projeto.largura, projeto.altura, projeto.espessura));

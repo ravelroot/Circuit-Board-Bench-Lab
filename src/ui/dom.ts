@@ -46,10 +46,20 @@ export const estilo = <T extends HTMLElement | SVGElement>(el: T, props: Record<
   return el;
 };
 
+let zoomGuardado = 0;
+
 export const zoomDaPagina = (): number => {
+  if (zoomGuardado) return zoomGuardado;
   const z = Number.parseFloat(getComputedStyle(document.documentElement).zoom);
-  return Number.isFinite(z) && z > 0 ? z : 1;
+  zoomGuardado = Number.isFinite(z) && z > 0 ? z : 1;
+  return zoomGuardado;
 };
+
+if (typeof window !== 'undefined') {
+  window.addEventListener('resize', () => {
+    zoomGuardado = 0;
+  });
+}
 
 export const copiarTexto = async (texto: string): Promise<boolean> => {
   try {

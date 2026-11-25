@@ -215,7 +215,7 @@ test('a montagem com solda avança peça a peça até a placa ficar pronta', asy
   expect(total).toBeGreaterThan(3);
   await expect(painel.locator('.montagem-passo')).toHaveAttribute('data-tipo', 'pegar');
   await painel.locator('.montagem-item').nth(1).click();
-  await expect(painel.locator('.montagem-aviso')).toContainText('Siga a ordem');
+  await expect(page.locator('.montagem-toast')).toContainText('Siga a ordem');
   await painel.locator('.montagem-item').first().click();
   await expect(painel.locator('.montagem-passo')).toHaveAttribute('data-tipo', 'colocar');
   await painel.locator('.montagem-acao').click();
@@ -267,3 +267,23 @@ test('o quiz corrige a resposta e a comparação lado a lado troca as placas', a
   await expect(page).toHaveURL(/#\/comparar\/esp32-s3\/uno-r3$/);
 });
 
+
+test('a vitrine troca de placa no mesmo palco 3D, sem recriar a cena', async ({ page }) => {
+  await page.goto('./#/uno-r3');
+  await expect(page.locator('.vitrine canvas')).toBeVisible();
+  await page.evaluate(() => {
+    (window as unknown as { __tela?: Element | null }).__tela = document.querySelector('.vitrine canvas');
+  });
+  await page.locator('.vitrine .carrossel-item[data-placa="nano"]').click();
+  await expect(page).toHaveURL(/#\/nano$/);
+  await expect(page.locator('.vitrine')).toHaveAttribute('data-placa', 'nano');
+  await expect(page.locator('.vitrine .vitrine-botao.destaque')).toHaveAttribute('href', '#/nano/montar');
+  expect(await page.evaluate(() => (window as unknown as { __tela?: Element | null }).__tela === document.querySelector('.vitrine canvas'))).toBe(true);
+});
+
+test('o menu Lição abre o primeiro lab da placa atual', async ({ page }) => {
+  await page.goto('./#/uno-r3');
+  await page.locator('.cabecalho .nav-link', { hasText: 'Lição' }).click();
+  await expect(page).toHaveURL(/#\/uno-r3\/[a-z0-9-]+$/);
+  await expect(page.locator('.cabecalho .nav-link', { hasText: 'Lição' })).toHaveAttribute('aria-current', 'page');
+});

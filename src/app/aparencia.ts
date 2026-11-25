@@ -8,7 +8,7 @@ export interface DefinicaoPaleta {
 }
 
 export const PALETAS: readonly DefinicaoPaleta[] = [
-  { id: 'rumo', nome: 'Rumo', cores: ['#E6DDCE', '#A3B4BE', '#F6E4A6', '#5D1C16'] },
+  { id: 'rumo', nome: 'Rumo', cores: ['#ECE6DA', '#A3B4BE', '#E5532F', '#1E1B17'] },
   { id: 'bento', nome: 'Bento', cores: ['#F5F4F4', '#BAB7B6', '#4D4B4B', '#000000'] },
   { id: 'sonda', nome: 'Sonda', cores: ['#F3F1EC', '#7FA7B8', '#17212B', '#A8235A'] },
   { id: 'nexo', nome: 'Nexo', cores: ['#E8E8E8', '#D9D1CE', '#AB9D9D', '#000000'] },

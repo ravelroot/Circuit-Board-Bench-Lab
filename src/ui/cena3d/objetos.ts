@@ -191,8 +191,9 @@ export const ferroDeSolda = (): { grupo: THREE.Group; ponta: THREE.Mesh; brilho:
 
 export interface Fio3d {
   readonly grupo: THREE.Group;
-  readonly material: THREE.MeshStandardMaterial;
+  readonly material: THREE.MeshPhysicalMaterial;
   readonly atualizar: (a: THREE.Vector3, b: THREE.Vector3) => void;
+  readonly crescer: (k: number) => void;
   readonly descartar: () => void;
 }
 
@@ -209,34 +210,50 @@ export const COR_FIO: Record<string, string> = {
 
 export const fio3d = (corFio: string): Fio3d => {
   const grupo = new THREE.Group();
-  const material = cor(corFio, 0, 0.4);
+  const material = new THREE.MeshPhysicalMaterial({ color: corFio, metalness: 0, roughness: 0.32, clearcoat: 0.6, clearcoatRoughness: 0.25 });
   const capa = cor('#18181a', 0, 0.55);
-  const pontaA = caixa(2.6, 2.6, 13, capa);
-  const pontaB = caixa(2.6, 2.6, 13, capa);
+  const pontaA = arredondada(2.6, 2.6, 13, 0.5, capa);
+  const pontaB = arredondada(2.6, 2.6, 13, 0.5, capa);
   let corpo: THREE.Mesh | null = null;
+  let fracao = 1;
   grupo.add(pontaA, pontaB);
+  const aplicarFracao = (): void => {
+    if (!corpo) return;
+    const indice = corpo.geometry.index;
+    const total = indice ? indice.count : corpo.geometry.attributes.position?.count ?? 0;
+    corpo.geometry.setDrawRange(0, fracao >= 1 ? Infinity : Math.floor((total * fracao) / 6) * 6);
+    pontaB.visible = fracao >= 0.98;
+  };
   const atualizar = (a: THREE.Vector3, b: THREE.Vector3): void => {
     const d = a.distanceTo(b);
-    const alto = 14 + d * 0.32;
-    const curva = new THREE.CubicBezierCurve3(
+    const alto = 10 + d * 0.38;
+    const meio = a.clone().lerp(b, 0.5);
+    const curva = new THREE.CatmullRomCurve3([
       a.clone().add(new THREE.Vector3(0, 0, 13)),
-      a.clone().add(new THREE.Vector3(0, 0, 13 + alto)),
-      b.clone().add(new THREE.Vector3(0, 0, 13 + alto)),
+      a.clone().lerp(meio, 0.35).add(new THREE.Vector3(0, 0, 13 + alto * 0.78)),
+      meio.clone().add(new THREE.Vector3(0, 0, 13 + alto)),
+      b.clone().lerp(meio, 0.35).add(new THREE.Vector3(0, 0, 13 + alto * 0.78)),
       b.clone().add(new THREE.Vector3(0, 0, 13)),
-    );
+    ], false, 'centripetal');
+    const segmentos = Math.max(28, Math.round(d / 2.5));
     if (corpo) {
       grupo.remove(corpo);
       corpo.geometry.dispose();
     }
-    corpo = tubo(curva, 0.75, material, Math.max(24, Math.round(d / 3)));
+    corpo = tubo(curva, 0.75, material, segmentos);
     grupo.add(corpo);
     pontaA.position.set(a.x, a.y, a.z + 6.5);
     pontaB.position.set(b.x, b.y, b.z + 6.5);
+    aplicarFracao();
   };
   return {
     grupo,
     material,
     atualizar,
+    crescer: (k) => {
+      fracao = Math.max(0, Math.min(1, k));
+      aplicarFracao();
+    },
     descartar: () => {
       corpo?.geometry.dispose();
       pontaA.geometry.dispose();

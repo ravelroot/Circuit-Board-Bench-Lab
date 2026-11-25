@@ -2,6 +2,7 @@ import { nomePaleta, PALETA_PADRAO, PALETAS } from '../app/aparencia';
 import type { Contexto } from '../app/contexto';
 import type { Rota } from '../app/estado';
 import { caminho, mesmaRota } from '../app/rotas';
+import { labsDaPlaca } from '../dados/laboratorios';
 import { PLACA_INICIAL, placaPorId, PLACAS } from '../dados/placas';
 import { ui } from '../i18n/textos';
 import { MARCA } from '../marca';
@@ -45,9 +46,14 @@ export const montarCabecalho = (ctx: Contexto): HTMLElement => {
     ),
   );
 
-  const destinos: readonly { readonly chave: 'navPlacas' | 'navBancada' | 'navQuiz' | 'navComparar'; readonly rota: () => Rota; readonly paginas: readonly Rota['pagina'][] }[] = [
-    { chave: 'navPlacas', rota: () => ({ pagina: 'catalogo', placa: null, lab: null }), paginas: ['catalogo', 'placa', 'lab', 'montagem'] },
+  const licao = (): Rota => {
+    const lab = labsDaPlaca(loja.atual.rota.placa ?? '')[0] ?? labsDaPlaca(PLACA_INICIAL)[0];
+    return lab ? { pagina: 'lab', placa: lab.placa, lab: lab.id } : { pagina: 'catalogo', placa: null, lab: null };
+  };
+  const destinos: readonly { readonly chave: 'navPlacas' | 'navBancada' | 'navLicao' | 'navQuiz' | 'navComparar'; readonly rota: () => Rota; readonly paginas: readonly Rota['pagina'][] }[] = [
+    { chave: 'navPlacas', rota: () => ({ pagina: 'catalogo', placa: null, lab: null }), paginas: ['catalogo', 'placa', 'montagem'] },
     { chave: 'navBancada', rota: () => ({ pagina: 'bancada', placa: null, lab: null, extra: null }), paginas: ['bancada'] },
+    { chave: 'navLicao', rota: licao, paginas: ['lab'] },
     { chave: 'navQuiz', rota: () => ({ pagina: 'quiz', placa: null, lab: null }), paginas: ['quiz'] },
     { chave: 'navComparar', rota: () => ({ pagina: 'comparar', placa: loja.atual.rota.placa, lab: null, extra: null }), paginas: ['comparar'] },
   ];
