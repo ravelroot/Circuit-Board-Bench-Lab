@@ -3,6 +3,7 @@ import type { Placa } from '../../dados/tipos';
 import type { Footprint } from '../../pcb/modelo';
 import { ui, type ChaveTexto } from '../../i18n/textos';
 import { h, s, trocar, zoomDaPagina } from '../dom';
+import { densidadeDoPalco, renderizacaoLeve } from '../cena3d/qualidade';
 import { icone } from '../icones';
 import { construirCena, liberarAmbiente, poseParaRotacao, type Cena, type OpcoesFace } from './cena';
 
@@ -64,12 +65,12 @@ export const webglDisponivel = (): boolean => {
 export const montarVisor3d = (placa: Placa, opcoes: OpcoesVisor3d): Visor3d | null => {
   let renderer: THREE.WebGLRenderer;
   try {
-    renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
+    renderer = new THREE.WebGLRenderer({ antialias: !renderizacaoLeve(), alpha: true, powerPreference: 'high-performance' });
   } catch {
     return null;
   }
-  renderer.setPixelRatio(Math.max(1, Math.min((window.devicePixelRatio || 1) * zoomDaPagina(), 2)));
-  renderer.shadowMap.enabled = true;
+  renderer.setPixelRatio(densidadeDoPalco(Math.max(1, Math.min((window.devicePixelRatio || 1) * zoomDaPagina(), 2))));
+  renderer.shadowMap.enabled = !renderizacaoLeve();
   renderer.shadowMap.type = THREE.PCFShadowMap;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.05;

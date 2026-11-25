@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { ambienteDe } from '../kicad/cena';
 import { h, zoomDaPagina } from '../dom';
+import { densidadeDoPalco, renderizacaoLeve } from './qualidade';
 
 export interface Pose3d {
   inclinacao: number;
@@ -63,8 +64,8 @@ export const registrarLiberacao = (fn: () => void): void => {
 
 const novoRenderer = (): THREE.WebGLRenderer | null => {
   try {
-    const r = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
-    r.shadowMap.enabled = true;
+    const r = new THREE.WebGLRenderer({ antialias: !renderizacaoLeve(), alpha: true, powerPreference: 'high-performance' });
+    r.shadowMap.enabled = !renderizacaoLeve();
     r.shadowMap.type = THREE.PCFShadowMap;
     r.toneMapping = THREE.ACESFilmicToneMapping;
     r.toneMappingExposure = 1.0;
@@ -99,7 +100,7 @@ export const montarPalco = (opcoes: OpcoesPalco): Palco3d | null => {
   const reserva = reservarRenderer();
   if (!reserva) return null;
   const { renderer } = reserva;
-  renderer.setPixelRatio(Math.max(1, Math.min((window.devicePixelRatio || 1) * zoomDaPagina() * 1.5, 2)));
+  renderer.setPixelRatio(densidadeDoPalco(Math.max(1, Math.min((window.devicePixelRatio || 1) * zoomDaPagina() * 1.5, 2))));
   const tela = renderer.domElement;
   tela.className = 'palco3d-tela';
   tela.removeAttribute('style');

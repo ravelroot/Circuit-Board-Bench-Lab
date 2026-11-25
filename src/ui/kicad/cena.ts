@@ -3,6 +3,7 @@ import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment
 import type { Placa } from '../../dados/tipos';
 import { projetoDe } from '../../pcb/gerador';
 import type { ProjetoPcb } from '../../pcb/modelo';
+import { resolucaoDeTextura } from '../cena3d/qualidade';
 import { construirModelo, Fabrica } from './modelos3d';
 import { desenharFace, desenharPbr } from './texturas';
 
@@ -79,7 +80,7 @@ export const construirCena = (placa: Placa, renderer: THREE.WebGLRenderer, textu
   grupo.add(conteudo);
   cena.add(grupo);
 
-  const pxmm = pxmmPara(projeto, texturaMax);
+  const pxmm = pxmmPara(projeto, resolucaoDeTextura(texturaMax));
   const texturaDe = (canvas: HTMLCanvasElement, cor: boolean): THREE.CanvasTexture => {
     const t = fab.guardar(new THREE.CanvasTexture(canvas));
     t.colorSpace = cor ? THREE.SRGBColorSpace : THREE.NoColorSpace;

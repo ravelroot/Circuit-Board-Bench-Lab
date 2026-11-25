@@ -2,6 +2,8 @@ import * as THREE from 'three';
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 import type { ModuloBancada } from '../../dados/bancada3d';
 import { h } from '../dom';
+import { capturarPng, densidadeDaTela, quandoOcioso } from './captura';
+import { renderizacaoLeve } from './qualidade';
 import { construirModulo } from './modulos';
 
 const LARGURA = 240;
@@ -14,8 +16,8 @@ let trabalhando = false;
 const obterEstudio = (): typeof estudio => {
   if (estudio !== undefined) return estudio;
   try {
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
-    renderer.setPixelRatio(2);
+    const renderer = new THREE.WebGLRenderer({ antialias: !renderizacaoLeve(), alpha: true, preserveDrawingBuffer: true });
+    renderer.setPixelRatio(densidadeDaTela(2));
     renderer.setSize(LARGURA, ALTURA, false);
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.08;
@@ -30,9 +32,9 @@ const obterEstudio = (): typeof estudio => {
   return estudio;
 };
 
-const renderizar = (modulo: ModuloBancada): string | null => {
+const renderizar = (modulo: ModuloBancada): Promise<string | null> => {
   const e = obterEstudio();
-  if (!e) return null;
+  if (!e) return Promise.resolve(null);
   const cena = new THREE.Scene();
   cena.environment = e.ambiente;
   cena.add(new THREE.HemisphereLight('#ffffff', '#5b606b', 1.1));
@@ -51,7 +53,7 @@ const renderizar = (modulo: ModuloBancada): string | null => {
   camera.position.set(tamanho * 0.25, -tamanho * 1.55, tamanho * 1.35);
   camera.lookAt(0, 0, 0);
   e.renderer.render(cena, camera);
-  const url = e.renderer.domElement.toDataURL('image/png');
+  const captura = capturarPng(e.renderer.domElement);
   cena.traverse((o) => {
     if (o instanceof THREE.Mesh) {
       o.geometry.dispose();
@@ -61,7 +63,15 @@ const renderizar = (modulo: ModuloBancada): string | null => {
       }
     }
   });
-  return url;
+  return captura;
+};
+
+const gerar = async ({ modulo, img }: { modulo: ModuloBancada; img: HTMLImageElement }): Promise<void> => {
+  const url = prontas.get(modulo.tipo) ?? (img.isConnected ? await renderizar(modulo) : null);
+  if (!url) return;
+  prontas.set(modulo.tipo, url);
+  img.src = url;
+  img.classList.add('pronta');
 };
 
 const processar = (): void => {
@@ -69,20 +79,12 @@ const processar = (): void => {
   const item = fila.shift();
   if (!item) return;
   trabalhando = true;
-  const agendar = (fn: () => void): void => {
-    if (typeof window.requestIdleCallback === 'function') window.requestIdleCallback(() => fn(), { timeout: 400 });
-    else setTimeout(fn, 16);
-  };
-  agendar(() => {
-    const url = prontas.get(item.modulo.tipo) ?? (item.img.isConnected ? renderizar(item.modulo) : null);
-    if (url) {
-      prontas.set(item.modulo.tipo, url);
-      item.img.src = url;
-      item.img.classList.add('pronta');
-    }
-    trabalhando = false;
-    processar();
-  });
+  quandoOcioso(() => {
+    void gerar(item).finally(() => {
+      trabalhando = false;
+      processar();
+    });
+  }, 400);
 };
 
 export const miniaturaModulo = (modulo: ModuloBancada, reserva: Node): HTMLElement => {

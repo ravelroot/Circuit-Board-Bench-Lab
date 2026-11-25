@@ -1,5 +1,7 @@
 import * as THREE from 'three';
 import type { Placa } from '../../dados/tipos';
+import { capturarPng, densidadeDaTela, quandoOcioso } from '../cena3d/captura';
+import { renderizacaoLeve } from '../cena3d/qualidade';
 import { h } from '../dom';
 import { construirCena, poseParaRotacao } from './cena';
 import { vistaEstatica } from './editor2d';
@@ -19,8 +21,8 @@ const obterRenderer = (): THREE.WebGLRenderer | null => {
     return null;
   }
   try {
-    renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
-    renderer.setPixelRatio(1.5);
+    renderer = new THREE.WebGLRenderer({ antialias: !renderizacaoLeve(), alpha: true, preserveDrawingBuffer: true });
+    renderer.setPixelRatio(densidadeDaTela(1.5));
     renderer.setSize(LARGURA, ALTURA, false);
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -30,17 +32,17 @@ const obterRenderer = (): THREE.WebGLRenderer | null => {
   return renderer;
 };
 
-const renderizar = (placa: Placa): string | null => {
+const renderizar = (placa: Placa): Promise<string | null> => {
   const r = obterRenderer();
-  if (!r) return null;
+  if (!r) return Promise.resolve(null);
   const cena = construirCena(placa, r, 1400, false);
   cena.grupo.setRotationFromEuler(poseParaRotacao(50, 0, -22));
   const camera = new THREE.PerspectiveCamera(28, LARGURA / ALTURA, 1, cena.tamanho * 20);
   camera.position.set(0, 0, cena.tamanho * 1.6);
   r.render(cena.cena, camera);
-  const url = r.domElement.toDataURL('image/png');
+  const captura = capturarPng(r.domElement);
   cena.descartar();
-  return url;
+  return captura;
 };
 
 const naTela = (img: HTMLImageElement): boolean => {
@@ -53,26 +55,25 @@ const proximo = (): { placa: Placa; img: HTMLImageElement } | undefined => {
   return i > 0 ? fila.splice(i, 1)[0] : fila.shift();
 };
 
+const gerar = async ({ placa, img }: { placa: Placa; img: HTMLImageElement }): Promise<void> => {
+  if (!img.isConnected) return;
+  const url = prontas.get(placa.id) ?? (await renderizar(placa));
+  if (!url) return;
+  prontas.set(placa.id, url);
+  if (img.isConnected) img.src = url;
+};
+
 const processar = (): void => {
   if (trabalhando) return;
   const item = proximo();
   if (!item) return;
   trabalhando = true;
-  setTimeout(() => {
-    if (!item.img.isConnected) {
+  quandoOcioso(() => {
+    void gerar(item).finally(() => {
       trabalhando = false;
       processar();
-      return;
-    }
-    const pronta = prontas.get(item.placa.id);
-    const url = pronta ?? renderizar(item.placa);
-    if (url) {
-      prontas.set(item.placa.id, url);
-      if (item.img.isConnected) item.img.src = url;
-    }
-    trabalhando = false;
-    processar();
-  }, 16);
+    });
+  });
 };
 
 export const miniatura = (placa: Placa): HTMLElement => {

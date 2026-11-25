@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js';
+import { resolucaoDeTextura } from './qualidade';
 
 export const cor = (c: string, metalness = 0, roughness = 0.55): THREE.MeshStandardMaterial => new THREE.MeshStandardMaterial({ color: c, metalness, roughness });
 
@@ -57,7 +58,7 @@ export interface OpcoesTapete {
 }
 
 export const tapete = (o: OpcoesTapete, renderer: THREE.WebGLRenderer): THREE.Mesh => {
-  const px = Math.min(4, 2048 / Math.max(o.largura, o.altura));
+  const px = Math.min(4, resolucaoDeTextura(2048) / Math.max(o.largura, o.altura));
   const [c, g] = canvas(Math.round(o.largura * px), Math.round(o.altura * px));
   g.fillStyle = o.cor;
   g.fillRect(0, 0, c.width, c.height);

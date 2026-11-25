@@ -194,6 +194,8 @@ test('a vitrine 3D troca de vista, mostra rótulos e leva à montagem', async ({
   const vitrine = page.locator('.vitrine');
   await expect(vitrine.locator('canvas')).toBeVisible();
   await expect(vitrine.locator('.carrossel-item[aria-current="page"]')).toHaveAttribute('data-placa', 'uno-r3');
+  const miniatura = vitrine.locator('.carrossel-item[data-placa="uno-r3"] img.miniatura-img');
+  await expect.poll(() => miniatura.evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth > 0), { timeout: 20_000 }).toBe(true);
   await vitrine.locator('[data-vista="topo"]').click();
   await expect(vitrine.locator('[data-vista="topo"]')).toHaveAttribute('aria-pressed', 'true');
   await vitrine.getByRole('button', { name: 'Rótulos' }).click();
@@ -207,7 +209,7 @@ test('a vitrine 3D troca de vista, mostra rótulos e leva à montagem', async ({
 });
 
 test('a montagem com solda avança peça a peça até a placa ficar pronta', async ({ page }) => {
-  test.setTimeout(90_000);
+  test.slow();
   await page.goto('./#/nodemcu/montar');
   const painel = page.locator('.montagem-painel');
   await expect(painel.locator('.montagem-titulo')).toHaveText('NodeMCU ESP8266 v3');
