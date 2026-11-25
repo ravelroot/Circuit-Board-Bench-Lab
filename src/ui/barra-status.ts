@@ -15,7 +15,13 @@ export const montarBarraStatus = (ctx: Contexto): HTMLElement => {
     const e = loja.atual;
     const placa = placaPorId(e.rota.placa);
     const lab = labPorId(e.rota.lab);
-    const local = lab && placa ? `${placa.nome} · ${tr(lab.titulo)}` : placa ? placa.nome : ui('catalogoTitulo', { n: PLACAS.length });
+    const paginas: Partial<Record<typeof e.rota.pagina, string>> = {
+      bancada: ui('bancadaVirtual'),
+      quiz: ui('tituloQuiz'),
+      comparar: ui('tituloComparar'),
+      montagem: placa ? `${ui('kitMontagem')} · ${placa.nome}` : ui('kitMontagem'),
+    };
+    const local = paginas[e.rota.pagina] ?? (lab && placa ? `${placa.nome} · ${tr(lab.titulo)}` : placa ? placa.nome : ui('catalogoTitulo', { n: PLACAS.length }));
     trocar(
       esquerda,
       h('span', {}, `${MARCA.nome} ${MARCA.versao}`),

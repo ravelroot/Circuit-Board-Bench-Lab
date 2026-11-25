@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import type { Placa } from '../../dados/tipos';
 import type { Footprint } from '../../pcb/modelo';
 import { ui, type ChaveTexto } from '../../i18n/textos';
-import { h, s, trocar } from '../dom';
+import { h, s, trocar, zoomDaPagina } from '../dom';
 import { icone } from '../icones';
 import { construirCena, liberarAmbiente, poseParaRotacao, type Cena, type OpcoesFace } from './cena';
 
@@ -62,7 +62,7 @@ export const montarVisor3d = (placa: Placa, opcoes: OpcoesVisor3d): Visor3d | nu
   } catch {
     return null;
   }
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  renderer.setPixelRatio(Math.max(1, Math.min((window.devicePixelRatio || 1) * zoomDaPagina(), 2)));
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;

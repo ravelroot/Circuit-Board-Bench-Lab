@@ -16,10 +16,17 @@ import { montarAjuda, montarBusca } from './ui/dialogos';
 import { h } from './ui/dom';
 import { montarPaginaLab } from './ui/pagina-lab';
 import { montarPaginaPlaca } from './ui/pagina-placa';
+import { montarPaginaMontagem } from './ui/pagina-montagem';
+import { montarPaginaBancada } from './ui/pagina-bancada';
+import { montarPaginaQuiz } from './ui/pagina-quiz';
+import { montarPaginaComparar } from './ui/pagina-comparar';
+import { missaoPorId } from './dados/bancada3d';
+import { alternarLofi } from './ui/lofi';
 
 const catalogo = {
   placa: (id: string) => placaPorId(id) !== undefined,
   lab: (placa: string, lab: string) => labPorId(lab)?.placa === placa,
+  missao: (id: string) => missaoPorId(id) !== undefined,
   inicial: PLACA_INICIAL,
 };
 
@@ -54,6 +61,13 @@ const titulo = (): string => {
   const { rota } = loja.atual;
   const placa = placaPorId(rota.placa);
   const lab = labPorId(rota.lab);
+  if (rota.pagina === 'bancada') {
+    const missao = missaoPorId(rota.extra);
+    return missao ? `${missao.titulo[loja.atual.idioma]} · ${ui('bancadaVirtual')} · Rumo` : `${ui('bancadaVirtual')} · Rumo`;
+  }
+  if (rota.pagina === 'quiz') return `${ui('tituloQuiz')} · Rumo`;
+  if (rota.pagina === 'comparar') return `${ui('tituloComparar')} · Rumo`;
+  if (rota.pagina === 'montagem' && placa) return `${ui('kitMontagem')} · ${placa.nome} · Rumo`;
   if (lab && placa) return `${lab.titulo[loja.atual.idioma]} · ${placa.nome} · Rumo`;
   if (placa) return `${placa.nome} · Rumo`;
   return `${ui('catalogoTitulo', { n: PLACAS.length })} · Rumo`;
@@ -64,7 +78,12 @@ const desenhar = (rolar: boolean): void => {
   const { rota } = loja.atual;
   if (rota.pagina === 'lab' && rota.lab) atual = montarPaginaLab(ctx, rota.lab);
   else if (rota.pagina === 'placa' && rota.placa) atual = montarPaginaPlaca(ctx, rota.placa);
+  else if (rota.pagina === 'montagem' && rota.placa) atual = montarPaginaMontagem(ctx, rota.placa);
+  else if (rota.pagina === 'bancada') atual = montarPaginaBancada(ctx, rota.extra ?? null);
+  else if (rota.pagina === 'quiz') atual = montarPaginaQuiz(ctx, rota.placa);
+  else if (rota.pagina === 'comparar') atual = montarPaginaComparar(ctx, rota.placa, rota.extra ?? null);
   else atual = montarCatalogo(ctx);
+  moldura.dataset.pagina = rota.pagina;
   palco.replaceChildren(atual.el);
   laterais.atualizar();
   document.title = titulo();
@@ -112,7 +131,7 @@ document.addEventListener('keydown', (ev) => {
   }
   if (e.busca || e.ajuda) return;
   const alvo = ev.target as HTMLElement | null;
-  if (alvo && (alvo.closest('input, select, textarea, .visor, .editor, .simulador') || alvo.isContentEditable)) return;
+  if (alvo && (alvo.closest('input, select, textarea, .visor, .editor, .simulador, .palco3d') || alvo.isContentEditable)) return;
   if (ev.altKey || ev.ctrlKey || ev.metaKey) return;
   const acoes: Record<string, () => void> = {
     '/': () => loja.alterar({ busca: true }),
@@ -120,6 +139,13 @@ document.addEventListener('keydown', (ev) => {
     c: () => loja.alterar({ paleta: proximaPaleta(e.paleta) }),
     l: () => loja.alterar({ idioma: e.idioma === 'pt' ? 'en' : 'pt' }),
     p: () => navegar({ pagina: 'catalogo', placa: null, lab: null }),
+    b: () => navegar({ pagina: 'bancada', placa: null, lab: null, extra: null }),
+    q: () => navegar({ pagina: 'quiz', placa: null, lab: null }),
+    m: () => {
+      const placa = e.rota.placa ?? PLACA_INICIAL;
+      navegar({ pagina: 'montagem', placa, lab: null });
+    },
+    o: () => void alternarLofi(),
     ',': () => vizinhoPlaca(-1),
     '.': () => vizinhoPlaca(1),
     '[': () => vizinhoLab(-1),

@@ -166,10 +166,10 @@ test('em telas largas, as laterais navegam pelas placas e pela página', async (
   const direita = page.locator('.trilho-contexto');
   await expect(esquerda).toBeVisible();
   await expect(direita).toBeVisible();
-  await expect(page.locator('.troca-placa')).toBeHidden();
+  await expect(page.locator('html')).toHaveCSS('zoom', '0.75');
   await expect(esquerda.locator('.trilho-placa[aria-current="page"]')).toHaveAttribute('data-placa', 'esp32-s3');
-  await expect(direita.locator('.trilho-indice-item')).toHaveCount(4);
-  await expect(direita.locator('.trilho-indice-item[aria-current="location"]')).toHaveText(/Visão geral/);
+  await expect(direita.locator('.trilho-indice-item')).toHaveCount(5);
+  await expect(direita.locator('.trilho-indice-item[aria-current="location"]')).toHaveText(/Vitrine 3D/);
   await direita.locator('.trilho-indice-item', { hasText: 'Laboratórios' }).click();
   await expect(direita.locator('.trilho-indice-item[aria-current="location"]')).toHaveText(/Laboratórios/);
   await esquerda.locator('.trilho-busca').fill('jetson');
@@ -184,8 +184,86 @@ test('em telas largas, as laterais navegam pelas placas e pela página', async (
   await esquerda.locator('.trilho-todas').click();
   await expect(page).toHaveURL(/#\/placas$/);
   await expect(direita.locator('.trilho-indice-item')).toHaveCount(7);
-  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.setViewportSize({ width: 1024, height: 800 });
   await expect(esquerda).toBeHidden();
   await expect(direita).toBeHidden();
+});
+
+test('a vitrine 3D troca de vista, mostra rótulos e leva à montagem', async ({ page }) => {
+  await page.goto('./#/uno-r3');
+  const vitrine = page.locator('.vitrine');
+  await expect(vitrine.locator('canvas')).toBeVisible();
+  await expect(vitrine.locator('.carrossel-item[aria-current="page"]')).toHaveAttribute('data-placa', 'uno-r3');
+  await vitrine.locator('[data-vista="topo"]').click();
+  await expect(vitrine.locator('[data-vista="topo"]')).toHaveAttribute('aria-pressed', 'true');
+  await vitrine.getByRole('button', { name: 'Rótulos' }).click();
+  await expect(vitrine.locator('.vitrine-rotulos')).toBeVisible();
+  await vitrine.getByRole('button', { name: 'Ache a peça' }).click();
+  await expect(vitrine.locator('.vitrine-jogo')).toContainText('Rodada 1 de 5');
+  await vitrine.locator('.carrossel-item[data-placa="nano"]').click();
+  await expect(page).toHaveURL(/#\/nano$/);
+  await page.locator('.vitrine-botao.destaque').click();
+  await expect(page).toHaveURL(/#\/nano\/montar$/);
+});
+
+test('a montagem com solda avança peça a peça até a placa ficar pronta', async ({ page }) => {
+  test.setTimeout(90_000);
+  await page.goto('./#/nodemcu/montar');
+  const painel = page.locator('.montagem-painel');
+  await expect(painel.locator('.montagem-titulo')).toHaveText('NodeMCU ESP8266 v3');
+  const total = await painel.locator('.montagem-item').count();
+  expect(total).toBeGreaterThan(3);
+  await expect(painel.locator('.montagem-passo')).toHaveAttribute('data-tipo', 'pegar');
+  await painel.locator('.montagem-item').nth(1).click();
+  await expect(painel.locator('.montagem-aviso')).toContainText('Siga a ordem');
+  await painel.locator('.montagem-item').first().click();
+  await expect(painel.locator('.montagem-passo')).toHaveAttribute('data-tipo', 'colocar');
+  await painel.locator('.montagem-acao').click();
+  await expect(painel.locator('.montagem-passo')).toHaveAttribute('data-tipo', 'soldar');
+  for (let n = 1; n <= total; n++) {
+    await painel.getByRole('button', { name: 'Colocar a próxima' }).click();
+    await expect(painel.locator('.montagem-item.est-soldada')).toHaveCount(n, { timeout: 8000 });
+  }
+  await expect(painel.locator('.montagem-passo')).toHaveAttribute('data-tipo', 'fim');
+  await expect(painel.locator('.montagem-item.est-soldada')).toHaveCount(total);
+  await page.keyboard.press('Escape');
+  await expect(page).toHaveURL(/#\/nodemcu$/);
+});
+
+test('a bancada liga a missão, executa e escreve no Serial', async ({ page }) => {
+  await page.goto('./#/bancada/ola-led');
+  const bancada = page.locator('.bancada3d');
+  await expect(bancada.locator('canvas')).toBeVisible();
+  await expect(bancada.locator('.bancada3d-missao')).toContainText('Olá, LED');
+  await bancada.getByRole('button', { name: 'Executar' }).click();
+  await expect(bancada.locator('.bancada3d-aviso')).toContainText('Faltam 2 ligações');
+  await bancada.getByRole('button', { name: 'Ligar para mim' }).click();
+  await expect(bancada.locator('.bancada3d-progresso')).toHaveText('2 de 2 ligações feitas');
+  await bancada.getByRole('button', { name: 'Executar' }).click();
+  await expect(bancada.getByRole('button', { name: 'Parar' })).toBeVisible();
+  await bancada.getByRole('tab', { name: 'Serial' }).click();
+  await expect(bancada.locator('.bancada3d-serial')).toContainText('D13 HIGH - LED aceso');
+  await bancada.getByRole('tab', { name: 'Código' }).click();
+  await expect(bancada.locator('.bancada3d-codigo')).toContainText('digitalWrite(LED_PIN, HIGH)');
+  await bancada.getByRole('button', { name: 'Parar' }).click();
+  await bancada.locator('.bancada3d-missoes').selectOption('dimmer');
+  await expect(page).toHaveURL(/#\/bancada\/dimmer$/);
+  await expect(bancada.locator('.bancada3d-controle')).toHaveCount(1);
+  await page.reload();
+  await expect(bancada.locator('.bancada3d-missao')).toContainText('Dimmer');
+});
+
+test('o quiz corrige a resposta e a comparação lado a lado troca as placas', async ({ page }) => {
+  await page.goto('./#/quiz');
+  await expect(page.locator('.quiz-opcao').first()).toBeVisible();
+  await page.locator('.quiz-opcao').first().click();
+  await expect(page.locator('.quiz-explica')).toBeVisible();
+  await expect(page.locator('.quiz-opcao.certa')).toHaveCount(1);
+  await page.locator('.cabecalho .nav-link', { hasText: 'Comparar' }).click();
+  await page.goto('./#/comparar/uno-r3/esp32-s3');
+  await expect(page.locator('.comparar-coluna').first()).toHaveAttribute('data-placa', 'uno-r3');
+  await expect(page.locator('.comparar-tabela tr.difere').first()).toBeVisible();
+  await page.locator('.comparar-trocar').click();
+  await expect(page).toHaveURL(/#\/comparar\/esp32-s3\/uno-r3$/);
 });
 

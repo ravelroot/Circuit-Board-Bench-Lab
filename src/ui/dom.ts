@@ -46,6 +46,11 @@ export const estilo = <T extends HTMLElement | SVGElement>(el: T, props: Record<
   return el;
 };
 
+export const zoomDaPagina = (): number => {
+  const z = Number.parseFloat(getComputedStyle(document.documentElement).zoom);
+  return Number.isFinite(z) && z > 0 ? z : 1;
+};
+
 export const copiarTexto = async (texto: string): Promise<boolean> => {
   try {
     await navigator.clipboard.writeText(texto);

@@ -8,6 +8,7 @@ import { MARCA } from '../marca';
 import { h, trocar } from './dom';
 import { icone, logotipo } from './icones';
 import { abrirMenu } from './menu';
+import { alternarLofi, aoMudarLofi, lofiTocando } from './lofi';
 
 const INICIO: Rota = { pagina: 'placa', placa: PLACA_INICIAL, lab: null };
 
@@ -44,6 +45,20 @@ export const montarCabecalho = (ctx: Contexto): HTMLElement => {
     ),
   );
 
+  const destinos: readonly { readonly chave: 'navPlacas' | 'navBancada' | 'navQuiz' | 'navComparar'; readonly rota: () => Rota; readonly paginas: readonly Rota['pagina'][] }[] = [
+    { chave: 'navPlacas', rota: () => ({ pagina: 'catalogo', placa: null, lab: null }), paginas: ['catalogo', 'placa', 'lab', 'montagem'] },
+    { chave: 'navBancada', rota: () => ({ pagina: 'bancada', placa: null, lab: null, extra: null }), paginas: ['bancada'] },
+    { chave: 'navQuiz', rota: () => ({ pagina: 'quiz', placa: null, lab: null }), paginas: ['quiz'] },
+    { chave: 'navComparar', rota: () => ({ pagina: 'comparar', placa: loja.atual.rota.placa, lab: null, extra: null }), paginas: ['comparar'] },
+  ];
+  const links = destinos.map((d) => {
+    const a = h('a', { class: 'nav-link', href: caminho(d.rota()), onclick: (ev: Event) => { ev.preventDefault(); loja.alterar({ busca: false, ajuda: false }); ctx.navegar(d.rota()); } });
+    return { a, d };
+  });
+  const navegacao = h('nav', { class: 'nav-principal' }, ...links.map((l) => l.a));
+  const lofi = h('button', { class: 'lofi', type: 'button', 'aria-pressed': 'false', onclick: () => alternarLofi() }, h('span', { class: 'lofi-ondas', 'aria-hidden': 'true' }, h('i', {}), h('i', {}), h('i', {})), h('span', { class: 'lofi-texto' }));
+  aoMudarLofi(() => atualizar());
+
   const marca = h('a', { class: 'marca', href: caminho(INICIO), onclick: irParaInicio }, h('span', { class: 'marca-quadro' }, logotipo()), h('span', { class: 'marca-texto' }, h('strong', { class: 'marca-nome' }, MARCA.nome), slogan));
 
   const cabecalho = h(
@@ -51,7 +66,9 @@ export const montarCabecalho = (ctx: Contexto): HTMLElement => {
     { class: 'cabecalho' },
     marca,
     seletor,
+    navegacao,
     h('div', { class: 'espaco' }),
+    lofi,
     gatilhoBusca,
     ajuda,
     credito,
@@ -82,6 +99,18 @@ export const montarCabecalho = (ctx: Contexto): HTMLElement => {
     tema.title = ui('tema');
     paleta.setAttribute('aria-label', ui('paleta'));
     paleta.title = `${ui('paleta')} · ${nomePaleta(e.paleta)}`;
+    navegacao.setAttribute('aria-label', ui('navegacao'));
+    for (const { a, d } of links) {
+      a.textContent = ui(d.chave);
+      a.href = caminho(d.rota());
+      a.setAttribute('aria-current', d.paginas.includes(e.rota.pagina) ? 'page' : 'false');
+    }
+    const tocando = lofiTocando();
+    lofi.setAttribute('aria-pressed', String(tocando));
+    lofi.title = tocando ? ui('lofiParar') : ui('lofiTocar');
+    lofi.setAttribute('aria-label', lofi.title);
+    const textoLofi = lofi.querySelector('.lofi-texto');
+    if (textoLofi) textoLofi.textContent = ui('lofi');
   };
 
   atualizar();

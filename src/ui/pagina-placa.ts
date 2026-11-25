@@ -3,12 +3,13 @@ import { normalizar } from '../app/navegador';
 import { alternar, pecasUsadas, resumirBancada, situacao, type Situacao } from '../app/progresso';
 import { labsDaPlaca } from '../dados/laboratorios';
 import { pecaPorId } from '../dados/pecas';
-import { placaPorId, PLACAS } from '../dados/placas';
+import { placaPorId } from '../dados/placas';
 import type { Laboratorio, Placa } from '../dados/tipos';
 import { tr, ui } from '../i18n/textos';
-import { estilo, h, s, trocar } from './dom';
+import { estilo, h, s, trocar, zoomDaPagina } from './dom';
 import { icone } from './icones';
 import { montarJanela } from './kicad/janela';
+import { montarVitrine } from './vitrine';
 
 const dois = (n: number): string => String(n).padStart(2, '0');
 
@@ -32,25 +33,7 @@ export const ladrilho = (ctx: Contexto, lab: Laboratorio, sit: Situacao, extra?:
     extra ? h('small', { class: 'ladrilho-extra' }, extra) : null,
   );
 
-const montarHeroi = (ctx: Contexto, placa: Placa, labs: readonly Laboratorio[]): HTMLElement => {
-  const vizinhas = PLACAS.filter((p) => p.categoria === placa.categoria);
-  const troca = h(
-    'nav',
-    { class: 'troca-placa', 'aria-label': ui('placas') },
-    ...vizinhas.map((p) =>
-      h('a', { class: `chip-placa${p.id === placa.id ? ' atual' : ''}`, href: `#/${p.id}`, 'aria-current': p.id === placa.id ? 'page' : null, onclick: (ev: Event) => { ev.preventDefault(); ctx.navegar({ pagina: 'placa', placa: p.id, lab: null }); } }, p.sigla),
-    ),
-    h('a', { class: 'chip-placa todas', href: '#/placas', onclick: (ev: Event) => { ev.preventDefault(); ctx.navegar({ pagina: 'catalogo', placa: null, lab: null }); } }, icone('grade', 'icone mini'), ui('catalogoTitulo', { n: PLACAS.length })),
-  );
-
-  requestAnimationFrame(() => {
-    const atual = troca.querySelector<HTMLElement>('.atual');
-    if (!atual || !troca.isConnected) return;
-    const caixa = troca.getBoundingClientRect();
-    const chip = atual.getBoundingClientRect();
-    troca.scrollLeft += chip.left - caixa.left - (caixa.width - chip.width) / 2;
-  });
-
+const montarHeroi = (placa: Placa, labs: readonly Laboratorio[]): HTMLElement => {
   const ficha = h(
     'aside',
     { class: 'ficha' },
@@ -63,7 +46,6 @@ const montarHeroi = (ctx: Contexto, placa: Placa, labs: readonly Laboratorio[]):
   return h(
     'section',
     { class: 'heroi', id: 'visao' },
-    troca,
     h(
       'div',
       { class: 'heroi-corpo' },
@@ -194,7 +176,8 @@ const montarConheca = (placa: Placa, labs: readonly Laboratorio[]): Conheca => {
       linhas.replaceChildren();
       if (getComputedStyle(linhas).display === 'none') return;
       const base = grade.getBoundingClientRect();
-      estilo(linhas, { width: `${base.width}px`, height: `${base.height}px` });
+      const z = zoomDaPagina();
+      estilo(linhas, { width: `${base.width / z}px`, height: `${base.height / z}px` });
       linhas.setAttribute('viewBox', `0 0 ${base.width} ${base.height}`);
       for (const [id, cartao] of cartoes) {
         const alvo = visor.retangulo(id);
@@ -301,15 +284,23 @@ export const montarPaginaPlaca = (ctx: Contexto, id: string): Pagina => {
   const placa = placaPorId(id);
   if (!placa) return { el: h('p', {}, ui('naoEncontrada')), destruir: () => undefined };
   const labs = labsDaPlaca(placa.id);
+  const vitrine = montarVitrine(ctx, placa);
   const conheca = montarConheca(placa, labs);
   const el = h(
     'div',
     { class: 'pagina-placa', 'data-placa': placa.id },
-    montarHeroi(ctx, placa, labs),
+    vitrine.el,
+    montarHeroi(placa, labs),
     labs.length ? montarBancada(ctx, placa, labs) : null,
     conheca.el,
     labs.length ? montarMapa(ctx, placa, labs) : null,
     h('footer', { class: 'rodape' }, h('button', { class: 'botao', type: 'button', onclick: () => window.scrollTo({ top: 0, behavior: 'smooth' }) }, icone('cima', 'icone mini'), ui('voltarTopo'))),
   );
-  return { el, destruir: conheca.destruir };
+  return {
+    el,
+    destruir: () => {
+      vitrine.destruir();
+      conheca.destruir();
+    },
+  };
 };

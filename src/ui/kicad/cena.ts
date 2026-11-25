@@ -28,7 +28,7 @@ export const pxmmPara = (p: ProjetoPcb, maximo: number): number => Math.min(28, 
 
 const ambientes = new WeakMap<THREE.WebGLRenderer, THREE.Texture>();
 
-const ambienteDe = (renderer: THREE.WebGLRenderer): THREE.Texture => {
+export const ambienteDe = (renderer: THREE.WebGLRenderer): THREE.Texture => {
   const pronto = ambientes.get(renderer);
   if (pronto) return pronto;
   const pmrem = new THREE.PMREMGenerator(renderer);

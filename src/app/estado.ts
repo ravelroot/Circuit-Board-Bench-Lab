@@ -3,10 +3,13 @@ import { ehPaleta, PALETA_PADRAO, temaDoSistema, type Paleta, type Tema } from '
 
 export type { Paleta, Tema } from './aparencia';
 
+export type TipoPagina = 'catalogo' | 'placa' | 'lab' | 'montagem' | 'bancada' | 'quiz' | 'comparar';
+
 export interface Rota {
-  readonly pagina: 'catalogo' | 'placa' | 'lab';
+  readonly pagina: TipoPagina;
   readonly placa: string | null;
   readonly lab: string | null;
+  readonly extra?: string | null;
 }
 
 export interface Estado {

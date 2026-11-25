@@ -1,4 +1,4 @@
-import { h } from './dom';
+import { h, zoomDaPagina } from './dom';
 import { icone } from './icones';
 
 export interface ItemMenu {
@@ -78,10 +78,11 @@ export const abrirMenu = (ancora: HTMLElement, itens: readonly ItemMenu[]): void
 
   menu.addEventListener('keydown', teclado);
   document.body.append(menu);
+  const z = zoomDaPagina();
   const caixa = ancora.getBoundingClientRect();
-  const largura = menu.offsetWidth;
-  menu.style.top = `${Math.round(caixa.bottom + 6)}px`;
-  menu.style.left = `${Math.round(Math.max(8, Math.min(window.innerWidth - largura - 8, caixa.right - largura)))}px`;
+  const largura = menu.offsetWidth * z;
+  menu.style.top = `${Math.round((caixa.bottom + 6) / z)}px`;
+  menu.style.left = `${Math.round(Math.max(8, Math.min(window.innerWidth - largura - 8, caixa.right - largura)) / z)}px`;
   ancora.setAttribute('aria-expanded', 'true');
   document.addEventListener('pointerdown', foraDoMenu, true);
   window.addEventListener('resize', fechar);

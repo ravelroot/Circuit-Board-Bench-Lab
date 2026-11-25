@@ -1,8 +1,8 @@
 {
   "name": "rumo",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "private": true,
-  "description": "Bancada de eletrônica interativa: placas peça a peça, inventário e laboratórios com fiação, comandos, passos, simuladores e código.",
+  "description": "Bancada de eletrônica interativa: vitrine 3D, montagem com solda, bancada virtual com fiação e missões, quiz, comparação e laboratórios com simuladores e código.",
   "license": "SEE LICENSE IN LICENSE",
   "type": "module",
   "engines": {

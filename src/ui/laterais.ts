@@ -6,7 +6,7 @@ import { LABORATORIOS, labPorId, labsDaPlaca } from '../dados/laboratorios';
 import { placaPorId, PLACAS } from '../dados/placas';
 import type { Categoria, Laboratorio, Placa } from '../dados/tipos';
 import { nomeCategoria, ORDEM_CATEGORIAS, tr, ui, type ChaveTexto } from '../i18n/textos';
-import { estilo, h, trocar } from './dom';
+import { estilo, h, trocar, zoomDaPagina } from './dom';
 import { icone } from './icones';
 
 export interface Laterais {
@@ -111,7 +111,7 @@ export const montarLaterais = (ctx: Contexto): Laterais => {
     if (!item || !visivel(esquerda)) return;
     const caixa = navegador.getBoundingClientRect();
     const alvo = item.getBoundingClientRect();
-    if (alvo.top < caixa.top + 8 || alvo.bottom > caixa.bottom - 8) navegador.scrollTop += alvo.top - caixa.top - caixa.height / 3;
+    if (alvo.top < caixa.top + 8 || alvo.bottom > caixa.bottom - 8) navegador.scrollTop += (alvo.top - caixa.top - caixa.height / 3) / zoomDaPagina();
   };
 
   campo.addEventListener('input', desenharLista);
@@ -133,7 +133,7 @@ export const montarLaterais = (ctx: Contexto): Laterais => {
     cancelAnimationFrame(quadro);
     quadro = requestAnimationFrame(() => {
       const raiz = document.documentElement;
-      const max = raiz.scrollHeight - window.innerHeight;
+      const max = raiz.scrollHeight * zoomDaPagina() - window.innerHeight;
       if (progresso) estilo(progresso, { '--fracao': max > 0 ? Math.min(1, window.scrollY / max).toFixed(4) : '0' });
       if (!alvos.length || !marca) return;
       const noFim = max > 0 && window.scrollY >= max - 4;
@@ -183,6 +183,7 @@ export const montarLaterais = (ctx: Contexto): Laterais => {
     const labs = labsDaPlaca(placa.id);
     const { bancada, feitos } = conjuntos(loja.atual);
     const itens: ItemIndice[] = [
+      { alvo: 'vitrine', rotulo: ui('vitrine') },
       { alvo: 'visao', rotulo: ui('visaoGeral') },
       ...(labs.length ? [{ alvo: 'bancada', rotulo: ui('bancadaCurta') }] : []),
       { alvo: 'conheca', rotulo: ui('conhecaPlaca'), extra: String(placa.partes.length) },
